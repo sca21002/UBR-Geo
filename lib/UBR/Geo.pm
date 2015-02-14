@@ -1,4 +1,7 @@
 package UBR::Geo;
+
+# ABSTRACT: UBR-Geo is a Web Application to search library media by geographic locations
+
 use Moose;
 use namespace::autoclean;
 
@@ -23,8 +26,6 @@ use Catalyst qw/
 /;
 
 extends 'Catalyst';
-
-our $VERSION = '0.01';
 
 # Configure the application.
 #

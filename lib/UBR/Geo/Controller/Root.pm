@@ -1,4 +1,8 @@
+use utf8;
 package UBR::Geo::Controller::Root;
+
+# ABSTRACT: Controller to run before all others
+
 use Moose;
 use namespace::autoclean;
 
