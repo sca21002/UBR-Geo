@@ -1,0 +1,37 @@
+<div class="container-fluid" id="content">
+  <div class="row">    
+    <div class="col-md-6">
+      <div id="map-container">
+        <ol-map></ol-map>
+      </div>
+    </div>
+    <div class="col-md-6">
+       <div id="grid-container">
+        <table class="table table-bordered table-hover">
+          <thead> 
+            <tr>
+              <td colspan="2"> 
+                   {{totalMaps}} Karten zu Pentling mit den Koordinaten {{x}}, {{y}} (Gauß-Krüger DHDN Zone 4) 
+              </td>    
+            <tr> 
+             <th>Signatur</th>
+             <th>Maßstab</th>    
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <td colspan="2" class="text-center">
+                 <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>  
+              </td>    
+            </tr>    
+          </tfoot>    
+          <tbody>    
+          <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)" dir-paginate="map in maps | itemsPerPage: 5" total-items="totalMaps">
+              <td>{{map.filename}}</td>  
+              <td>{{map.scale}}</td> 
+            </tr>
+          </tbody>  
+        </table>  
+    </div>   
+  </div>  
+</div>  
