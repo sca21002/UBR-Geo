@@ -25,12 +25,33 @@ Catalyst Controller.
 
 =cut
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
+sub maps : Chained('/base') PathPart('maps') Args(0) {
+    my ($self, $c) = @_;
 
-    $c->response->body('Matched UBR::Geo::Controller::Map in Map.');
+    my $xmin = 8.98;
+    my $ymin = 47.27;
+    my $xmax = 13.83;
+    my $ymax = 50.56;
+    
+    my $rs = $c->model('UBR::GeoDB::Map')->intersects_with_bbox(
+    	$xmin, $ymin, $xmax, $ymax,
+    );
+    my @rows;
+    while (my $row = $rs->next) {
+        my $href = { $row->get_columns() };
+        $href->{scale} =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1./g;
+        $href->{scale} = '1 : ' . $href->{scale} if $href->{scale};  
+        push @rows, $href; 
+    }    
+ 
+    my $response->{maps} = \@rows;
+    $response->{maps_total} = scalar @rows;
+
+    $c->stash(
+        %$response,
+        current_view => 'JSON'
+    );
 }
-
 
 
 =encoding utf8

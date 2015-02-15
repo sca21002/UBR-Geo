@@ -6,6 +6,12 @@ package UBR::Geo::View::JSON;
 use strict;
 use base 'Catalyst::View::JSON';
 
+__PACKAGE__->config({
+    expose_stash => [ qw(
+        maps maps_total
+    ) ],
+});
+
 =head1 NAME
 
 UBR::Geo::View::JSON - Catalyst JSON View
