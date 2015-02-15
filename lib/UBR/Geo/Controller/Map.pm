@@ -5,6 +5,7 @@ package UBR::Geo::Controller::Map;
 
 use Moose;
 use namespace::autoclean;
+use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -25,19 +26,27 @@ Catalyst Controller.
 
 =cut
 
-sub maps : Chained('/base') PathPart('maps') Args(0) {
+sub maps: Chained('/base') PathPart('map') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    
+    $c->stash->{map_rs} = $c->model('UBR::GeoDB::Map');
+}
+
+
+sub list : Chained('maps') PathPart('list') Args(0) {
     my ($self, $c) = @_;
 
     my $xmin = 8.98;
     my $ymin = 47.27;
     my $xmax = 13.83;
     my $ymax = 50.56;
-    
-    my $rs = $c->model('UBR::GeoDB::Map')->intersects_with_bbox(
+
+
+    my $map_rs = $c->stash->{map_rs}->intersects_with_bbox(
     	$xmin, $ymin, $xmax, $ymax,
     );
     my @rows;
-    while (my $row = $rs->next) {
+    while (my $row = $map_rs->next) {
         my $href = { $row->get_columns() };
         $href->{scale} =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1./g;
         $href->{scale} = '1 : ' . $href->{scale} if $href->{scale};  
@@ -52,6 +61,34 @@ sub maps : Chained('/base') PathPart('maps') Args(0) {
         current_view => 'JSON'
     );
 }
+
+sub map : Chained('maps') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $map_id) = @_;
+
+    my $rs = $c->stash->{map_rs}; 
+    my $map = $rs->find_with_geojson($map_id) 
+	|| $c->detach('not_found');
+    $c->stash->{map} = $map;
+}
+
+sub boundary : Chained('map') PathPart('boundary') Args(0) {
+    my ($self, $c) = @_;
+
+    my $feature = $c->stash->{map}->as_feature_object;
+    $c->log->debug($feature);
+    $c->stash(
+        feature => $feature,
+        current_view => 'GeoJSON',
+    );
+}
+
+sub not_found : Local {
+    my ($self, $c) = @_;
+    $c->response->status(404);
+    $c->stash->{error_msg} = "Map not found!";
+    $c->detach('list');
+}
+
 
 
 =encoding utf8

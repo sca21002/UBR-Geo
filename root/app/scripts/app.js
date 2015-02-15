@@ -48,8 +48,8 @@ ubrGeoApp.directive('olMap', function() {
             layers: [
               new ol.layer.Tile({
                 source: new ol.source.OSM({
-                    attributions : [ol.source.OSM.DATA_ATTRIBUTION],
-                    url : "http://pc1011406020.uni-regensburg.de/tiles/osm-bright/{z}/{x}/{y}.png",
+//                    attributions : [ol.source.OSM.DATA_ATTRIBUTION],
+                    //url : "http://pc1011406020.uni-regensburg.de/tiles/osm-bright/{z}/{x}/{y}.png",
                     crossOrigin: null
                 })
               })

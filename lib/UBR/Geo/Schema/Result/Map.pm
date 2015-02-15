@@ -125,7 +125,29 @@ __PACKAGE__->add_unique_constraint("filename", ["filename"]);
 # Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-02-14 16:25:51
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4dvLgQNzceKWLW7Uz18S/A
 
+use Geo::JSON;
+use Geo::JSON::Feature;
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+sub as_feature_object {
+    my $self = shift;
+
+    my $geometry_object = Geo::JSON->from_json(
+        $self->get_column('boundary')
+    );
+
+    my %properties = map { $_ => $self->get_column($_) }
+        $self->non_geometry_columns;
+
+    return Geo::JSON::Feature->new({
+        geometry   => $geometry_object,
+        properties => \%properties,
+    });
+}
+
+sub non_geometry_columns {
+    my %columns = %{ shift->result_source->columns_info };
+    grep { $columns{$_}{data_type} ne 'geometry' } keys(%columns);
+}
+
 __PACKAGE__->meta->make_immutable;
 1;

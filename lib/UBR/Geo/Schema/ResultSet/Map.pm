@@ -29,13 +29,29 @@ sub intersects_with_bbox {
             $xmin, $ymin, $xmax, $ymax, $srt
          ],
         {   
-            select => [ qw( filename scale ), 
+            select => [ qw( fid filename scale ), 
             ], 
-            as     => [ qw( filename scale ) ],
+            as     => [ qw( map_id filename scale ) ],
             order_by => { -desc => \[
                 $area_query . ' / scale ^ 2',
                 $xmin, $ymin, $xmax, $ymax, $srt
             ]},      
         },
     );
+}
+
+sub find_with_geojson {
+    my $self = shift;
+    my $map_id = shift;
+
+
+    return $self->search(
+        {
+	    fid => $map_id,
+        },
+        {
+            '+select' => \'ST_AsGeoJSON(ST_Transform(boundary_wld,\'4326\'))',
+            '+as'     => 'boundary',
+        },
+    )->first;
 }
