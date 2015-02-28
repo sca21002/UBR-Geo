@@ -16,14 +16,14 @@ my $shp_drivername = 'ESRI Shapefile';
 my $shp_driver = Geo::OGR::GetDriverByName($shp_drivername)
 	or confess "Driver '" . $shp_drivername ."' not available";
 
-my $shp_filename = '/home/gis/GeoPortOst_save/boundary.shp';
+my $shp_filename = '/home/gis/UBR-Geo/data/boundary.shp';
 my $shp_datasource = $shp_driver->Open($shp_filename);
 
 my $shp_lyr_boundary = $shp_datasource->GetLayerByName('boundary');
 
 my $config_dir = path($Bin)->parent(2);
 my $config_hash = Config::ZOMG->open(
-    name => 'ubrgeo',
+    name => 'ubr_geo',
     path => $config_dir,
 ) or confess "No config file found in $config_dir";
 
@@ -48,6 +48,17 @@ my $pg_lyr_boundary_px   =  $pg_datasource->GetLayerByName('maps(boundary_px)');
 while (my $boundary = $shp_lyr_boundary->GetNextFeature()) {
     my $fid = $boundary->GetFID();
     my $basename = $boundary->{filename};
+    
+    $pg_lyr_boundary->SetAttributeFilter("filename = '$basename'");
+    my $maybe_boundary = $pg_lyr_boundary->GetNextFeature();
+    my $boundary_exists;
+    if ($maybe_boundary) {
+        my $fid = $maybe_boundary->GetFID();
+        say "Boundary $basename with fid $fid found in database. Skipping ...";
+        $boundary_exists = 1;
+    }
+    next if $boundary_exists;
+
     my ($order_id) = $basename =~ /^(ubr\d{5})_\d{1,5}$/;
     say "Working on: $fid: $basename";
     my $file = path('/media/sca21002/rzblx9/scanflow/final/', $order_id, '/mst/tif/', $basename .'.tif');

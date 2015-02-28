@@ -8,7 +8,7 @@ use base 'Catalyst::View::JSON';
 
 __PACKAGE__->config({
     expose_stash => [ qw(
-        maps maps_total
+        maps maps_total page
     ) ],
 });
 

@@ -36,14 +36,31 @@ sub maps: Chained('/base') PathPart('map') CaptureArgs(0) {
 sub list : Chained('maps') PathPart('list') Args(0) {
     my ($self, $c) = @_;
 
-    my $xmin = 8.98;
-    my $ymin = 47.27;
-    my $xmax = 13.83;
-    my $ymax = 50.56;
+    my $bbox = $c->req->params->{bbox};
+    $c->log->debug('BBox: ' . $bbox);
+    my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
 
+    #my $xmin = 8.98;
+    #my $ymin = 47.27;
+    #my $xmax = 13.83;
+    #my $ymax = 50.56;
+
+    my $page = $c->req->params->{page} || 1; 
+    $c->log->debug("Page: $page");
+    my $entries_per_page = 5;
 
     my $map_rs = $c->stash->{map_rs}->intersects_with_bbox(
-    	$xmin, $ymin, $xmax, $ymax,
+	{ 
+	    xmin => $xmin, 
+            ymin => $ymin, 
+            xmax => $xmax,
+            ymax =>  $ymax,
+        },
+        {
+            page => $page,
+            rows => $entries_per_page,
+            
+        },
     );
     my @rows;
     while (my $row = $map_rs->next) {
@@ -54,7 +71,12 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     }    
  
     my $response->{maps} = \@rows;
-    $response->{maps_total} = scalar @rows;
+
+    $response->{page}    = $page;
+    #$response->{total}   = $map_rs->pager->last_page;
+    $response->{maps_total} = $map_rs->pager->total_entries;
+   
+    $c->log->debug('Total entries: ', $response->{maps_total});
 
     $c->stash(
         %$response,
