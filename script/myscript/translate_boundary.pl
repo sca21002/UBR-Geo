@@ -80,7 +80,8 @@ while (my $boundary = $shp_lyr_boundary->GetNextFeature()) {
         #say "Points:", Dumper($geom_new->Points());
         $geom_segmented->Segmentize(118);
         #say "Points:", Dumper($geom_new->Points());
-       
+
+        my $multipolygon_dst = Geo::OGR::Geometry->create('MultiPolygon');       
         my $polygon_dst = Geo::OGR::Geometry->create('Polygon');
         my $rings_src = $geom_segmented->Points();     # a polygon is a list of rings 
         foreach my $ring_src (@$rings_src) {
@@ -95,10 +96,11 @@ while (my $boundary = $shp_lyr_boundary->GetNextFeature()) {
             }
             $polygon_dst->AddGeometry($ring_dst);
         }
+        $multipolygon_dst->AddGeometry($polygon_dst);
         my $pg_boundary = Geo::OGR::Feature->create($pg_lyr_boundary->Schema);
         $pg_boundary->SetField(filename => $basename);    
         $pg_boundary->SetField(resolution => $tiff->resolution);    
-        $pg_boundary->Geometry($polygon_dst);
+        $pg_boundary->Geometry($multipolygon_dst);
         my $resolution = $tiff->resolution;
         say "resolution: $resolution";
         my $area_map = $geom_simple->Area / ( $resolution / 2.54 * 100) ** 2;

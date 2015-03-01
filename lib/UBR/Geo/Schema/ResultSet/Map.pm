@@ -25,11 +25,12 @@ sub intersects_with_bbox {
     my $srt  = 4326; 
 
     my $envelope   = 'ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?), 3857)';
-    my $area_query = 'ST_Area(ST_Intersection(boundary_wld, ' . $envelope . '))';
+    my $area_query = 'ST_Area(ST_Intersection(boundary.boundary_wld, ' . $envelope . '))';
 
     $attrs = {
     	%$attrs,
-        select => [ qw( fid filename scale ), 
+        join   => [ 'boundary' ],
+        select => [ qw( map_id filename scale ), 
         ], 
         as     => [ qw( map_id filename scale ) ],
         order_by => { -desc => \[
@@ -39,11 +40,14 @@ sub intersects_with_bbox {
         
     };
 
-    return $self->search(
+    return $self->search({
+        -and => [
         \[
             $area_query . ' > 0',
             $xmin, $ymin, $xmax, $ymax, $srt
          ],
+         scale => { '>' => 0 },
+        ]}, 
         $attrs,
     );
 }
@@ -55,10 +59,11 @@ sub find_with_geojson {
 
     return $self->search(
         {
-	    fid => $map_id,
+	    map_id => $map_id,
         },
         {
-            '+select' => \'ST_AsGeoJSON(ST_Transform(boundary_wld,\'4326\'))',
+            join      => [ 'boundary' ],
+            '+select' => \'ST_AsGeoJSON(ST_Transform(boundary.boundary_wld,\'4326\'))',
             '+as'     => 'boundary',
         },
     )->first;
