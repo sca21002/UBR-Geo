@@ -40,24 +40,27 @@ my $pg_drivername = 'PostgreSQL';
 my $pg_driver = Geo::OGR::GetDriverByName($pg_drivername)
 	or confess "Driver '" . $pg_drivername ."' not available";
 my $pg_datasource = $pg_driver->Open($connectstr, $update);
-my $pg_lyr_boundary   =  $pg_datasource->GetLayerByName('maps(boundary_wld)');
+my $pg_lyr_boundary   =  $pg_datasource->GetLayerByName('boundaries(boundary_wld)');
+my $pg_lyr_map        =  $pg_datasource->GetLayerByName('maps');
 
-my $pg_lyr_boundary_px   =  $pg_datasource->GetLayerByName('maps(boundary_px)');
+
+my $pg_lyr_boundary_px   =  $pg_datasource->GetLayerByName('boundaries(boundary_px)');
 
 
 while (my $boundary = $shp_lyr_boundary->GetNextFeature()) {
     my $fid = $boundary->GetFID();
+    
     my $basename = $boundary->{filename};
     
-    $pg_lyr_boundary->SetAttributeFilter("filename = '$basename'");
-    my $maybe_boundary = $pg_lyr_boundary->GetNextFeature();
-    my $boundary_exists;
-    if ($maybe_boundary) {
-        my $fid = $maybe_boundary->GetFID();
-        say "Boundary $basename with fid $fid found in database. Skipping ...";
-        $boundary_exists = 1;
+    $pg_lyr_map->SetAttributeFilter("filename = '$basename'");
+    my $maybe_map = $pg_lyr_map->GetNextFeature();
+    my $map_exists;
+    if ($maybe_map) {
+        my $fid = $maybe_map->GetFID();
+        say "Map $basename with map_ud $fid found in database. Skipping ...";
+        $map_exists = 1;
     }
-    next if $boundary_exists;
+    next if $map_exists;
 
     my ($order_id) = $basename =~ /^(ubr\d{5})_\d{1,5}$/;
     say "Working on: $fid: $basename";
@@ -98,9 +101,17 @@ while (my $boundary = $shp_lyr_boundary->GetNextFeature()) {
         }
         $multipolygon_dst->AddGeometry($polygon_dst);
         my $pg_boundary = Geo::OGR::Feature->create($pg_lyr_boundary->Schema);
-        $pg_boundary->SetField(filename => $basename);    
-        $pg_boundary->SetField(resolution => $tiff->resolution);    
         $pg_boundary->Geometry($multipolygon_dst);
+        # with InsertFeature no FID can be got  
+        # $pg_lyr_boundary->InsertFeature($pg_boundary);
+        # so CreateFeature is used instead
+        $pg_lyr_boundary->CreateFeature($pg_boundary);
+        my $fid = $pg_boundary->GetFID();
+        say "Newly inserted geom with FID: ", $fid;
+        my $pg_map = Geo::OGR::Feature->create($pg_lyr_map->Schema);
+        $pg_map->SetField(boundary_id => $fid );    
+        $pg_map->SetField(filename => $basename);    
+        $pg_map->SetField(resolution => $tiff->resolution);    
         my $resolution = $tiff->resolution;
         say "resolution: $resolution";
         my $area_map = $geom_simple->Area / ( $resolution / 2.54 * 100) ** 2;
@@ -113,14 +124,16 @@ while (my $boundary = $shp_lyr_boundary->GetNextFeature()) {
         say "Scale: $scale";
         $scale = sprintf("%d", $scale);
         say "Masstab: 1 : $scale"; 
-        $pg_boundary->SetField(resolution => $resolution);
-        $pg_boundary->SetField(scale => $scale);
- 
-        $pg_lyr_boundary->InsertFeature($pg_boundary);
-        $pg_lyr_boundary_px->SetAttributeFilter("filename = '$basename'");
+        $pg_map->SetField(scale => $scale);
+        $pg_lyr_map->InsertFeature($pg_map);
+
+
+        my $multipolygon_px = Geo::OGR::Geometry->create('MultiPolygon');      
+        $multipolygon_px->AddGeometry($geom_simple); 
+        $pg_lyr_boundary_px->SetAttributeFilter("fid = $fid");
         my $pg_boundary_px = $pg_lyr_boundary_px->GetNextFeature();
         if ($pg_boundary_px) {
-	    $pg_boundary_px->Geometry($geom_simple);
+	    $pg_boundary_px->Geometry($multipolygon_px);
             $pg_lyr_boundary_px->SetFeature($pg_boundary_px);
         }
     }

@@ -67,9 +67,21 @@ ubrGeoApp.directive('olMap', function() {
             }),
             view: new ol.View({
               center: ol.proj.transform([12.053, 48.941], 'EPSG:4326', 'EPSG:3857'),
-              zoom: 5
+              // zoom: 2
             })
           });
+          console.log('map directive: ', scope.extent);
+          var extent_3857 = ol.proj.transformExtent(scope.extent, 'EPSG:4326', 'EPSG:3857');
+          console.log('init extent (3857): ', extent_3857);
+          var olMap = scope.olMap;
+          var view = olMap.getView();
+          var size = olMap.getSize();
+          view.fitExtent(extent_3857, size);
+          extent_3857 = view.calculateExtent( size );
+          console.log('fit extent (3857): ',  extent_3857); 
+          scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
+          scope.resolution = view.getResolution();
+          console.log('fit extent: ', scope.extent, ' res: ', scope.resolution);
         }
     };
 });

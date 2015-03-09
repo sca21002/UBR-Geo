@@ -25,7 +25,10 @@ sub intersects_with_bbox {
     my $srt  = 4326; 
 
     my $envelope   = 'ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?), 3857)';
-    my $area_query = 'ST_Area(ST_Intersection(boundary.boundary_wld, ' . $envelope . '))';
+    my $area_intsec 
+        = 'ST_Area(ST_Intersection(boundary.boundary_wld, ' . $envelope . '))';
+    my $area_intsec_sqr = $area_intsec . ' ^ 3';
+    my $area_query = "ST_Area(ST_Transform(ST_MakeEnvelope(?,$ymin,$xmax,$ymax,$srt),3857)) ^ 2";
 
     $attrs = {
     	%$attrs,
@@ -34,8 +37,9 @@ sub intersects_with_bbox {
         ], 
         as     => [ qw( map_id filename scale ) ],
         order_by => { -desc => \[
-            $area_query . ' / scale ^ 2',
-            $xmin, $ymin, $xmax, $ymax, $srt
+            $area_intsec_sqr 
+            . ' / ' . $area_query .' / scale ^ 2',
+            $xmin, $ymin, $xmax, $ymax, $srt, $xmin
         ]},      
         
     };
@@ -43,7 +47,7 @@ sub intersects_with_bbox {
     return $self->search({
         -and => [
         \[
-            $area_query . ' > 0',
+            $area_intsec . ' > 0',
             $xmin, $ymin, $xmax, $ymax, $srt
          ],
          scale => { '>' => 0 },

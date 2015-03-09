@@ -2,16 +2,16 @@
   <div class="row">    
     <div class="col-md-6">
       <div id="map-container">
-        <ol-map></ol-map>
+        <ol-map ng-mouseenter="mapEntered()" ng-mouseleave="mapLeft()"></ol-map>
       </div>
     </div>
     <div class="col-md-6">
        <div id="grid-container">
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover" ng-mouseleave="leave()">
           <thead> 
             <tr>
               <td colspan="2"> 
-                   {{totalMaps}} Karten zu GeoPortOst 
+                   {{totalMaps}} Karten gefunden
               </td>    
             <tr> 
              <th>Signatur</th>
@@ -26,7 +26,7 @@
             </tr>    
           </tfoot>    
           <tbody>    
-          <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)" dir-paginate="map in maps | itemsPerPage: 5" total-items="totalMaps">
+          <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)" dir-paginate="map in maps | itemsPerPage: 5" current-page="currentPage" total-items="totalMaps">
               <td>{{map.filename}}</td>  
               <td>{{map.scale}}</td> 
             </tr>
