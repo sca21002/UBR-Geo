@@ -60,14 +60,15 @@ ubrGeoApp.directive('olMap', function() {
                 })
               })
             ],
-            controls: ol.control.defaults({
-                attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-                    collapsible: false
+            controls: [
+                new ol.control.Zoom(),
+                new ol.control.OverviewMap({
+                    collapsed: false
                 })
-            }),
+            ],
             view: new ol.View({
               center: ol.proj.transform([12.053, 48.941], 'EPSG:4326', 'EPSG:3857'),
-              // zoom: 2
+              zoom: 2
             })
           });
           console.log('map directive: ', scope.extent);
@@ -82,6 +83,24 @@ ubrGeoApp.directive('olMap', function() {
           scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
           scope.resolution = view.getResolution();
           console.log('fit extent: ', scope.extent, ' res: ', scope.resolution);
+          scope.changeres = view.on('change:resolution', function(evt) {
+              console.log('Resolution: ', view.getResolution() );
+              var extent_3857 = view.calculateExtent( olMap.getSize() );
+              console.log('Extent (3857): ', extent_3857);
+              scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
+              console.log('Resolution changed: ', scope.extent);
+              scope.currentPage = 1;
+              scope.getData(scope.currentPage, scope.extent);
+          });     
+          olMap.on('moveend', function(evt) {
+              var map = evt.map;
+              var extent_3857 = map.getView().calculateExtent(map.getSize()); 
+              console.log('Extent (3857): ', extent_3857);
+              scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
+              console.log('Center changed: ', scope.extent);
+              scope.currentPage = 1;
+              scope.getData(scope.currentPage, scope.extent);
+          });
         }
     };
 });

@@ -2,7 +2,8 @@
 use utf8;
 use Path::Tiny;
 use FindBin qw($Bin);
-use lib path($Bin)->parent(3)->child(qw(Remedi lib))->stringify;
+use lib path($Bin)->parent(2)->child('lib')->stringify,
+        path($Bin)->parent(3)->child(qw(Remedi lib))->stringify;
 use Data::Dumper;
 use Modern::Perl;
 use Carp;
@@ -10,8 +11,7 @@ use Capture::Tiny ':all';
 use Getopt::Long;
 use Log::Log4perl qw(:easy);
 use Remedi::Imagefile;
-
-my @header_expected = ( qw(mapX mapY pixelX pixelY enable) );
+use UBR::Geo::GCP;
 
 my $gcp_dir;
 my $tiff_src;
@@ -60,13 +60,15 @@ INFO(scalar @gcp_files, " groundcontrolpoint files found");
 
 foreach my $gcp_file (@gcp_files) {
     INFO("Working  $gcp_file");
-    write_gcps($gcp_file);
+    my $gcp = UBR::Geo::GCP->new( file => $gcp_file );
+    write_gcps($gcp);
 }
 
 sub write_gcps {
-    my $gcp_file = shift;
+    my $gcp = shift;
 
-    my ($tiff_basename) = $gcp_file->basename =~ qr/(.*)\.points$/; 
+    my $tiff_basename = $gcp->filestem . '.tif'; 
+    INFO("File name: $tiff_basename");
     my $tiff_file       = Remedi::Imagefile->new(
         file =>	path($tiff_src, $tiff_basename),
         regex_filestem_prefix => qr/ubr\d{5}/,
@@ -75,38 +77,38 @@ sub write_gcps {
         library_union_id => 'bvb',
         isil => 'DE-355',  
     );
+
+    # gdal_translate removes icc profiles (sometimes?)
+
     INFO('ICC profile: ', $tiff_file->icc_profile || 'no icc profile');
     my $icc_profile;
     if ($tiff_file->icc_profile) {
-        $icc_profile = Path::Tiny->tempfile(SUFFIX => '.icc');
         my $cmd = 'exiftool';
         my @options = (
             '-icc_profile',
             '-b',
+            #    '-w icc',
             $tiff_file->stringify,
-            ">$icc_profile",
         );
-        system($cmd, @options);
-        # INFO($stdout);
-        # INFO("Error: $stderr") if $stderr;
+        INFO("Cmd: exiftool ", join " ",@options);
+        my ($stdout, $stderr, $exit) = capture {
+            system($cmd, @options);
+        };    
+        INFO("Error: $stderr") if $stderr;
+        INFO("Exit code: $exit") if $exit;
+        
+        my $unlink = 1;
+        $icc_profile = Path::Tiny->tempfile(
+            UNLINK => $unlink, SUFFIX => '.icc'
+        ); 
+
+        $icc_profile->spew_raw($stdout);
+        INFO("ICC profile saved in $icc_profile");
     }
+
     my $tiff_out_path     = path($tiff_dst, $tiff_basename);
-    my $data = $gcp_file->slurp;
     
-    my @lines  = split "\n", $data;
-    my @header = split ',', shift @lines;
-    
-    LOGCROAK('Unexpected header') unless @header == @header_expected;
-    for (my $i = 0; $i <= $#header; $i++) {
-        LOGCROAK('Unexpected header') unless $header[$i] eq $header_expected[$i];
-    } 
-    
-    my (%row, @coords);
-    foreach my $line ( @lines ) {
-        next if $line =~ /^\s*$/;
-        @row{@header} = map { s/^\s+|\s+$//gr }  split ',', $line;
-        push @coords, { %row };
-    }
+    my @coords = @{$gcp->gcps_as_href};
     
     my $cmd =  'gdal_translate';
     
@@ -116,38 +118,43 @@ sub write_gcps {
     ); 
     
     foreach my $coord (@coords) {
-        next unless $coord->{enable} == 1;
         push @options, '-gcp';
         push @options, 
-            sprintf("%.6g",   $coord->{pixelX}),
-            sprintf("%.6g", - $coord->{pixelY}),
-            sprintf("%.6g",   $coord->{mapX}),
-            sprintf("%.6g",   $coord->{mapY}),
+            sprintf("%.6g",   $coord->{GCPPixel}),
+            sprintf("%.6g", - $coord->{GCPLine}),
+            sprintf("%.6g",   $coord->{GCPX}),
+            sprintf("%.6g",   $coord->{GCPY}),
         ;
     }
     INFO(join ' ', $cmd, @options);
     
     my ($stdout, $stderr, $exit) = tee {
-        system($cmd, @options, $tiff_file, $tiff_out_path);
+        system($cmd, @options, $tiff_file->stringify, $tiff_out_path->stringify);
     };
-    INFO($stdout);
-    INFO("Error: $stderr") if $stderr;
+    #INFO($stdout);
+    #INFO("Error: $stderr") if $stderr;
     my $tiff_out = Remedi::Imagefile->new(
         file => $tiff_out_path,
+        regex_filestem_prefix => qr/ubr\d{5}/,
+        regex_filestem_var => qr/_\d{1,5}/,
+        size_class_border => 100,
+        library_union_id => 'bvb',
+        isil => 'DE-355',  
     );
     if ($icc_profile) { 
        INFO('ICC profile: ', $tiff_out->icc_profile || 'no icc profile');
+       INFO('Warn: ICC profile was kicked out by gdal_translate'); 
        unless ($tiff_out->icc_profile) {
            my $cmd = 'exiftool';
            my @options = (
-               "-icc_profile=$icc_profile",
+               '-icc_profile<=' . $icc_profile,
                $tiff_out_path,
            );
-           my ($stdout, $stderr, $exit) = tee {
+           INFO("Cmd exiftool: ", join ' ', @options);
+           my ($stdout, $stderr, $exit) = capture {
                system($cmd, @options);
            };
-           INFO($stdout);
-           INFO("Error: $stderr") if $stderr;
+           INFO("ICC profile is restored back to image file");
        }
     }
 }

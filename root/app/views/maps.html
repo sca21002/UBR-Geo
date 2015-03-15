@@ -7,26 +7,28 @@
     </div>
     <div class="col-md-6">
        <div id="grid-container">
-        <table class="table table-bordered table-hover" ng-mouseleave="leave()">
+        <table class="table table-bordered table-hover">
           <thead> 
             <tr>
               <td colspan="2"> 
                    {{totalMaps}} Karten gefunden
               </td>    
             <tr> 
+             <th>Vorschaubild</th>
              <th>Signatur</th>
              <th>Maßstab</th>    
             </tr>
           </thead>
           <tfoot>
             <tr>
-              <td colspan="2" class="text-center">
+              <td colspan="3" class="text-center">
                  <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>  
               </td>    
             </tr>    
           </tfoot>    
-          <tbody>    
+          <tbody ng-mouseleave="leave()">    
           <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)" dir-paginate="map in maps | itemsPerPage: 5" current-page="currentPage" total-items="totalMaps">
+              <td><img ng-src="http://digital.bib-bvb.de/webclient/DeliveryManager?pid={{map.url}}&custom_att_2=thumbnailstream"></td>
               <td>{{map.filename}}</td>  
               <td>{{map.scale}}</td> 
             </tr>

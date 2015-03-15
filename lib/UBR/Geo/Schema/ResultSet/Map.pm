@@ -33,9 +33,9 @@ sub intersects_with_bbox {
     $attrs = {
     	%$attrs,
         join   => [ 'boundary' ],
-        select => [ qw( map_id filename scale ), 
+        select => [ qw( map_id filename scale url ), 
         ], 
-        as     => [ qw( map_id filename scale ) ],
+        as     => [ qw( map_id filename scale url ) ],
         order_by => { -desc => \[
             $area_intsec_sqr 
             . ' / ' . $area_query .' / scale ^ 2',
@@ -51,6 +51,8 @@ sub intersects_with_bbox {
             $xmin, $ymin, $xmax, $ymax, $srt
          ],
          scale => { '>' => 0 },
+         # fid   => { '<' => 954 },
+         filename => { 'like' => 'ubr05510%' },
         ]}, 
         $attrs,
     );
