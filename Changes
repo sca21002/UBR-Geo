@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
 
+0.004     2015-03-16 14:25:05+01:00 Europe/Berlin
+
     - Script to get boundaries from GCPs is added.
       This is useful when the corners of the map can be used 
       as ground control points.
