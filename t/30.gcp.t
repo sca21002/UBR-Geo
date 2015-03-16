@@ -14,44 +14,52 @@ BEGIN {
 
 
 my $gcp = UBR::Geo::GCP->new(
-	file => path($Bin)->child(qw(input_files ubr05510_5764.tif.points)),
+	file => path($Bin)->child(qw(input_files ubr05510_5776.tif.points)),
 );
 
 
-my $gcps = [
-     {
-       'pixelY' => '-623',
-       'enable' => '1',
-       'mapY' => '45.75',
-       'pixelX' => '804',
-       'mapX' => '37.5'
-     },
-     {
-       'pixelY' => '-6570',
-       'enable' => '1',
-       'mapY' => '45.5',
-       'mapX' => '37.5',
-       'pixelX' => '757'
-     },
-     {
-       'mapX' => '38',
-       'pixelX' => '9090',
-       'enable' => '1',
-       'pixelY' => '-6588',
-       'mapY' => '45.5'
-     },
-     {
-       'mapX' => '38',
-       'pixelX' => '9092',
-       'pixelY' => '-638',
-       'enable' => '1',
-       'mapY' => '45.75'
-     }
+my $gcps_expected = [
+    {
+      'GCPX' => '43.5',
+      'GCPPixel' => '695',
+      'GCPLine' => '-550',
+      'GCPZ' => '0',
+      'Info' => '',
+      'Id' => '',
+      'GCPY' => '45.75'
+    },
+    {
+      'Info' => '',
+      'Id' => '',
+      'GCPY' => '45.5',
+      'GCPZ' => '0',
+      'GCPLine' => '-6470',
+      'GCPX' => '43.5',
+      'GCPPixel' => '659'
+    },
+    {
+      'GCPLine' => '-568',
+      'GCPX' => '44',
+      'GCPPixel' => '8932',
+      'GCPY' => '45.75',
+      'Id' => '',
+      'Info' => '',
+      'GCPZ' => '0'
+    },
+    {
+      'GCPZ' => '0',
+      'GCPY' => '45.5',
+      'Id' => '',
+      'Info' => '',
+      'GCPX' => '44',
+      'GCPPixel' => '8920',
+      'GCPLine' => '-6485'
+    }
 ];
 
-is_deeply($gcp->get_gcps, $gcps, 'GCPs read');
+my $gcps = $gcp->gcps_as_href;
 
-#diag Dumper($gcp->get_gcps);
+is_deeply($gcps, $gcps_expected, 'GCPs read');
 
 done_testing();
 

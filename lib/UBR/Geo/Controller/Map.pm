@@ -36,14 +36,10 @@ sub maps: Chained('/base') PathPart('map') CaptureArgs(0) {
 sub list : Chained('maps') PathPart('list') Args(0) {
     my ($self, $c) = @_;
 
-    my $bbox = $c->req->params->{bbox};
+    my $bbox = $c->req->params->{bbox} || '8.98,47.27,13.83,50.56';
+    
     $c->log->debug('BBox: ' . $bbox);
     my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
-
-    #my $xmin = 8.98;
-    #my $ymin = 47.27;
-    #my $xmax = 13.83;
-    #my $ymax = 50.56;
 
     my $page = $c->req->params->{page} || 1; 
     $c->log->debug("Page: $page");

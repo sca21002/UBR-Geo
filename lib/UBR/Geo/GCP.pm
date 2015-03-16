@@ -97,7 +97,7 @@ sub _build_gcps_as_href {
         GCPY     => $_->{GCPY},
         GCPZ     => $_->{GCPZ},
         Id       => $_->{Id}, 
-        GCP      => $_->{Info},
+        Info     => $_->{Info},
     } } @{$self->gcps};
 
     return \@coords;

@@ -72,7 +72,7 @@ sub write_gcps {
     $multipolygon_wld->Points($mp);
     
     INFO('Geometry created: ', $multipolygon_wld->GetGeometryName());
-    INFO(' with ', scalar @{$multipolygon_wld->Points()->[0][0]}, ' Points');
+ass_geo_1_1_g_d_a_l_1_1_transformer.html   INFO(' with ', scalar @{$multipolygon_wld->Points()->[0][0]}, ' Points');
 
     my $pg_boundary = Geo::OGR::Feature->create($pg_lyr_boundary->Schema);
     $pg_boundary->Geometry($multipolygon_wld);
