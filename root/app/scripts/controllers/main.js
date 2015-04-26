@@ -9,9 +9,19 @@
  */
 angular.module('ubrGeoApp')
   .controller('MainCtrl', function ($scope) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+    $scope.getClass = function (path) {
+      if(path === '/') {
+          if($location.path() === '/') {
+              return "active";
+          } else {
+              return "";
+          }
+      }
+   
+      if ($location.path().substr(0, path.length) === path) {
+          return "active";
+      } else {
+          return "";
+      }
+    }
   });

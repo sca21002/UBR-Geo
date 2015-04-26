@@ -10,7 +10,10 @@
 angular.module('ubrGeoApp')
   .controller('MapsCtrl', function ($scope, $http, $routeParams, $window, $location) {
 
-    var bbox_str = $routeParams.bbox; 
+    var bbox_str = $routeParams.bbox;
+    if (!bbox_str) {
+        bbox_str = '8.98,47.27,13.83,50.56';
+    }
     var bbox     = bbox_str.split(',');
     $scope.extent = [];
     $scope.extent[0] = parseFloat(bbox[0]);

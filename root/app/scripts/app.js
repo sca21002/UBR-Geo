@@ -32,13 +32,12 @@ var ubrGeoApp = angular
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       })
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
       .otherwise({
-        redirectTo: '/'
+        redirectTo: '/maps/list'
       });
+  })
+  .run(function($rootScope){
+    $rootScope.mapId = 1;
   });
 
 // Template for pagination
