@@ -6,6 +6,7 @@ package UBR::Geo::Controller::Map;
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
+use UBR::Geo::Geotransform;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -63,6 +64,7 @@ sub list : Chained('maps') PathPart('list') Args(0) {
         my $href = { $row->get_columns() };
         $href->{scale} =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1./g;
         $href->{scale} = '1 : ' . $href->{scale} if $href->{scale};  
+        $href->{isbd} = $row->title_isbd;
         push @rows, $href; 
     }    
  
@@ -80,7 +82,8 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     );
 }
 
-sub map : Chained('maps') PathPart('') CaptureArgs(1) {
+
+sub map_with_geojson : Chained('maps') PathPart('') CaptureArgs(1) {
     my ($self, $c, $map_id) = @_;
 
     my $rs = $c->stash->{map_rs}; 
@@ -89,7 +92,8 @@ sub map : Chained('maps') PathPart('') CaptureArgs(1) {
     $c->stash->{map} = $map;
 }
 
-sub boundary : Chained('map') PathPart('boundary') Args(0) {
+
+sub boundary : Chained('map_with_geojson') PathPart('boundary') Args(0) {
     my ($self, $c) = @_;
 
     my $feature = $c->stash->{map}->as_feature_object;
@@ -97,6 +101,63 @@ sub boundary : Chained('map') PathPart('boundary') Args(0) {
     $c->stash(
         feature => $feature,
         current_view => 'GeoJSON',
+    );
+}
+
+sub map : Chained('maps') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $map_id) = @_;
+
+    my $rs = $c->stash->{map_rs}; 
+    my $map = $rs->find($map_id) 
+	|| $c->detach('not_found');
+    $c->stash->{map} = $map;
+}
+
+sub detail : Chained('map') PathPart('detail') Args(0) {
+    my ($self, $c) = @_;
+
+    my $map = $c->stash->{map};
+    my $href = { $map->get_columns() };
+
+    my $response = { detail => $href };
+    $c->stash(
+        %$response,
+        current_view => 'JSON'
+    );
+}
+
+sub geotransform : Chained('map') PathPart('geotransform') Args(0) {
+    my ($self, $c) = @_;
+
+    my $x_geo = $c->req->params->{x};
+    my $y_geo = $c->req->params->{y};
+    my $invers = $c->req->params->{invers};
+    my $srid   = $c->req->params->{srid} || 3857; 
+
+    unless (
+        defined $x_geo 
+        && defined $y_geo
+        && $invers 
+    ) {
+	    $c->detach('not_found');
+    }
+
+    my $map = $c->stash->{map};
+    my $geotransform_row = $map->geotransform;    
+    my $geotransform = UBR::Geo::Geotransform->new(
+        $geotransform_row->get_columns()
+    );
+
+    $c->log->debug("Transform: $x_geo, $y_geo, $srid");
+    my ($x_px, $y_px) 
+        = $geotransform->transform_invers($x_geo, $y_geo, $srid);
+    $x_px = sprintf("%.0f",$x_px);
+    $y_px = sprintf("%.0f",$y_px);
+
+    my $response = { pixel => [$x_px, $y_px]  };
+    $c->stash(
+        %$response,
+        current_view => 'JSON'
     );
 }
 

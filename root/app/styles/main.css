@@ -1,3 +1,43 @@
+.navbar {
+    font-size: 12px;
+    min-height:25px;
+    margin-bottom: 0px;
+}
+
+.navbar-brand {
+    float: left;
+    font-size: 12px;
+    height: 30px;
+    line-height: 20px;
+    padding: 7px;
+}
+
+
+.navbar-nav > li > a {
+    padding-bottom: 7px;
+    padding-top: 7px;
+}
+
+#mapDetail {
+    border: 2px solid #cc0000;
+}
+
+#thumbnail-map {
+    height: 75px;
+}
+
+.map-row {
+    font-size: 75%;
+}
+
+.pagination {
+    border-radius: 4px;
+    display: inline-block;
+    margin: 5px 0;
+    padding-left: 0;
+    font-size: 12px;
+}
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;
@@ -74,7 +114,7 @@ body {
   }
   /* Space out the masthead */
   .header {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
   /* Remove the bottom border on the jumbotron for visual effect */
   .jumbotron {

@@ -1,34 +1,19 @@
 use utf8;
 package UBR::Geo::GCP;
 
-# ABSTRACT: Groundcontrol points file
+# ABSTRACT: Role for Groundcontrol points (GCP)
 
-use Moose;
+use Moose::Role;
+    requires qw(_build_gcps srid);
+    
 use MooseX::AttributeShortcuts;
 use Geo::GDAL;
-use UBR::Geo::Types qw(ArrayRef File GeoGDALGCP HashRef Num Str);
+use UBR::Geo::Types qw(
+    ArrayRef  GeoGDALGCP GeoGDALGeoTransform HashRef Num Str
+);
 use Data::Dumper;
 use Modern::Perl;
 use List::Util qw(first min max);
-use Carp;
-
-has 'file' => (
-    is => 'ro',
-    isa => File,
-    handles => [qw(basename)],
-    coerce => 1,
-    required => 1,
-);
-
-has 'filestem' => (
-    is => 'lazy',
-    isa => Str,
-);
-
-has 'header' => (
-    is => 'lazy',
-    isa => ArrayRef[Str], 
-);
 
 
 has 'gcps' => (
@@ -47,57 +32,38 @@ has 'gcps_convex_hull' => (
     isa => ArrayRef[GeoGDALGCP],
 );
 
-has 'geotransform' => (
-    is => 'lazy',
-    isa => ArrayRef[Num],
-);
+#has 'geotransform' => (
+#    is => 'lazy',
+#    isa => GeoGDALGeoTransform,
+#);
+#
+#has 'geotransform_as_href' => (
+#    is => 'lazy',
+#    isa => HashRef[Str],
+#);
 
 has 'segment_length' => (
     is => 'lazy',
     isa => Num,
 );
 
-
-sub _build_gcps {
-    my $self = shift;
-
-    my $data = $self->file->slurp;
-   
-    my @lines  = split "\n", $data;
-    my @header = split ',', shift @lines;
-    
-    die('Unexpected header ' . join('|', @header . " <> " . join('|', @{$self->header})) ) 
-	unless join('|', @header) eq join('|', @{$self->header});
-    
-    my (%row, @coords);
-    foreach my $line ( @lines ) {
-        next if $line =~ /^\s*$/;
-        if ( exists $row{enable} && $row{enable} eq 0 ) {
-            carp "line '$line' left out as GCP";
-        }
-        @row{@header} = map { s/^\s+|\s+$//gr }  split ',', $line;
-        $row{pixelX} = sprintf "%.0f", $row{pixelX};
-        $row{pixelY} = sprintf "%.0f", $row{pixelY};
-        push @coords, { %row };
-    }
-   
-    my @gcps = map {
-        Geo::GDAL::GCP->new( @{$_}{ qw(mapX mapY mapZ pixelX pixelY) } )
-    }  @coords;
-    return \@gcps;    
-}
+has 'srid' => (
+    is => 'ro', 
+    required => 1,
+    isa => Str,
+);    
 
 sub _build_gcps_as_href {
     my $self = shift;
 
     my @coords = map { {
-        GCPPixel => $_->{GCPPixel},
-        GCPLine  => $_->{GCPLine},
-        GCPX     => $_->{GCPX},
-        GCPY     => $_->{GCPY},
-        GCPZ     => $_->{GCPZ},
-        Id       => $_->{Id}, 
-        Info     => $_->{Info},
+        pixel => $_->{GCPPixel},
+        line  => $_->{GCPLine},
+        x     => $_->{GCPX},
+        y     => $_->{GCPY},
+        z     => $_->{GCPZ},
+        id    => $_->{Id}, 
+        info  => $_->{Info},
     } } @{$self->gcps};
 
     return \@coords;
@@ -113,7 +79,7 @@ sub _build_gcps_convex_hull {
     my @coords = @{$self->gcps_as_href}; 
 
     # get pixel coordinates
-    my @points = map { [$_->{GCPPixel}, $_->{GCPLine}] }  @coords;
+    my @points = map { [$_->{pixel}, $_->{line}] }  @coords;
 
     # build a multipoint geometry
     my $multipoint = Geo::OGR::Geometry->create('MultiPoint');
@@ -131,9 +97,9 @@ sub _build_gcps_convex_hull {
         my @point = @{ $points_sorted[$i] };
 
         my $coord = first { 
-                $_->{GCPPixel} == $point[0] 
+                $_->{pixel} == $point[0] 
                     && 
-                $_->{GCPLine} == $point[1] 
+                $_->{line} == $point[1] 
             } @coords; 
         
         die "Ordering points failed!" unless $coord;
@@ -144,26 +110,26 @@ sub _build_gcps_convex_hull {
 
     my @gcps = map {
         Geo::GDAL::GCP->new( 
-            @{$_}{ qw(GCPX GCPY GCPZ GCPPixel GCPLine Id Info) } 
+            @{$_}{ qw(x y z pixel line id info) } 
         );
     }  sort { $a->{sort} <=> $b->{sort} } @coords;
     return \@gcps;    
 }
 
+#sub _build_geotransform { Geo::GDAL::GCPsToGeoTransform((shift)->gcps) }
 
-sub _build_geotransform { Geo::GDAL::GCPsToGeoTransform((shift)->gcps) }
-
-
-sub _build_filestem {
-    my $self = shift;
-    
-    my ($filestem) = $self->basename =~ qr/^([^.]*)\./;
-    return $filestem;
-}
-
-
-sub _build_header { [ qw(mapX mapY pixelX pixelY enable) ] }
-
+#sub _build_geotransform_as_href {
+#    my $self = shift;
+#
+#    my @columns = (qw(
+#        upperleft_x scale_x skew_y upperleft_y skew_x scale_y 
+#    ));
+#    my %geotrans;
+#    @geotrans{@columns} = @{$self->geotransform};
+#    $geotrans{srid} = $self->srid;
+#    # say Dumper( \%geotrans );
+#    return \%geotrans;
+#}
 
 sub _build_segment_length {
     my $self = shift;
@@ -183,23 +149,43 @@ sub _build_segment_length {
 }
 
 
-sub transform_pixel {
-    my ($self, $pixelX, $pixelY ) = @_;
-
-    # warn "TEST:", $pixelX, $pixelY;
-
-    return unless defined($pixelX) && defined($pixelY);
-
-    my @tr = @{$self->geotransform};
-
-    my $x = $tr[0] + $pixelX * $tr[1] + $pixelY * $tr[2];
-    my $y = $tr[3] + $pixelX * $tr[4] + $pixelY * $tr[5];
-
-    return ($x, $y);
-}
-
-
-__PACKAGE__->meta->make_immutable();
+#sub transform_pixel {
+#    my ($self, $pixelX, $pixelY ) = @_;
+#
+#    # warn "TEST:", $pixelX, $pixelY;
+#
+#    return unless defined($pixelX) && defined($pixelY);
+#
+##    my @tr = @{$self->geotransform};
+##
+##    my $x = $tr[0] + $pixelX * $tr[1] + $pixelY * $tr[2];
+##    my $y = $tr[3] + $pixelX * $tr[4] + $pixelY * $tr[5];
+#
+#    my ($x, $y) 
+#        = Geo::GDAL::ApplyGeoTransform($self->geotransform, $pixelX, $pixelY);
+#
+#    return ($x, $y);
+#}
+#
+#sub transform_invers {
+#    my ($self, $x, $y) = @_;
+#
+#    return unless defined($x) && defined($y);
+#
+##    my ($a,$b,$c,$d,$e,$f) = @{$self->geotransform};
+##
+##    my $numerator   = ($x - $a) * $e - $b * $y + $b * $d;
+##    my $denominator = $c * $e - $b * $f;
+##    my $pixel_y = $numerator / $denominator;
+##    my $pixel_x = ($x - $a) / $b - $c / $b * $pixel_y;
+#   
+#    my $inv = Geo::GDAL::InvGeoTransform($self->geotransform);
+#
+#    my ($pixel_x, $pixel_y) 
+#        = Geo::GDAL::ApplyGeoTransform($inv, $x, $y); 
+#
+#    return ($pixel_x, $pixel_y);
+#}    
 
 1;
 

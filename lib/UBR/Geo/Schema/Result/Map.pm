@@ -149,11 +149,10 @@ __PACKAGE__->table("maps");
   data_type: 'integer'
   is_nullable: 1
 
-=head2 url
+=head2 pid
 
-  data_type: 'varchar'
+  data_type: 'integer'
   is_nullable: 1
-  size: 255
 
 =head2 pixel_x
 
@@ -164,6 +163,12 @@ __PACKAGE__->table("maps");
 
   data_type: 'integer'
   is_nullable: 1
+
+=head2 bvnr
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 11
 
 =cut
 
@@ -215,12 +220,14 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 50 },
   "serial_id",
   { data_type => "integer", is_nullable => 1 },
-  "url",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "pid",
+  { data_type => "integer", is_nullable => 1 },
   "pixel_x",
   { data_type => "integer", is_nullable => 1 },
   "pixel_y",
   { data_type => "integer", is_nullable => 1 },
+  "bvnr",
+  { data_type => "varchar", is_nullable => 1, size => 11 },
 );
 
 =head1 PRIMARY KEY
@@ -271,9 +278,39 @@ __PACKAGE__->belongs_to(
   },
 );
 
+=head2 gcps
 
-# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-02-28 20:39:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:aK1ryY6+VlQ15uNDow5NBQ
+Type: has_many
+
+Related object: L<UBR::Geo::Schema::Result::GCP>
+
+=cut
+
+__PACKAGE__->has_many(
+  "gcps",
+  "UBR::Geo::Schema::Result::GCP",
+  { "foreign.map_id" => "self.map_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 geotransform
+
+Type: might_have
+
+Related object: L<UBR::Geo::Schema::Result::Geotransform>
+
+=cut
+
+__PACKAGE__->might_have(
+  "geotransform",
+  "UBR::Geo::Schema::Result::Geotransform",
+  { "foreign.map_id" => "self.map_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-04-05 15:16:04
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KiDtdcCj9Oi6GbA9AVLecg
 
 use Geo::JSON;
 use Geo::JSON::Feature;
@@ -298,6 +335,40 @@ sub non_geometry_columns {
     my %columns = %{ shift->result_source->columns_info };
     grep { $columns{$_}{data_type} ne 'geometry' } keys(%columns);
 }
+
+sub title_isbd {
+    my $self = shift;
+
+    # add points as thousands separator
+    my $scale = $self->scale;
+    $scale =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1./g;
+
+    my $title_isbd;
+    $title_isbd .= $self->mab331 if $self->mab331;
+    my $line;
+    $line .= $self->mab100 if $self->mab100;
+    $line .= ' ; ' if $line and $self->mab104;
+    $line .= $self->mab104 if $self->mab104;
+    $line .= ' ; ' if $line and $self->mab108;
+    $line .= $self->mab108 if $self->mab108;
+    $line .= ' ; ' if $line and $self->mab112;
+    $line .= $self->mab112 if $self->mab112;
+    $line .= ' ; ' if $line and $self->u_mab089;
+    $line .= 'Blatt: ' . $self->u_mab089 if $self->u_mab089;
+    $line .= ' ; ' if $line and $self->u_mab331;
+    $line .= $self->u_mab331 if $self->u_mab331;
+    $line .= ' ; ' if $line and $self->mab425a;
+    $line .= $self->mab425a if $self->mab425a;
+    $line .= ' (' . $self->mab451 . ') ' if $self->mab451;
+    $line .= ' ; ' if $line and $line !~ /\)\s*$/ and $self->mab590a;
+    $line .= $self->mab590a if $self->mab590a;
+    $line .= ' ; ' if $line and $line !~ /\)\s*$/ and $scale;
+    $line .= '1:' . $scale if $scale;
+    $title_isbd .= '. - ' if $title_isbd and $line;
+    $title_isbd .= $line if $line;
+    return  $title_isbd;
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;

@@ -10,7 +10,8 @@ use UBR::Geo::Schema;
 
 sub get_connect_info {
 
-    my $config_dir = path(__FILE__)->parent(4); 
+    my $env = $ENV{UBR_GEO_CONFIG} || $ENV{CATALYST_CONFIG};
+    my $config_dir = $env ? path($env) : path(__FILE__)->parent(4); 
     my $config_hash = Config::ZOMG->open(
         name => 'ubr_geo',
         path => $config_dir,

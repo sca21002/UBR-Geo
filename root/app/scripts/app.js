@@ -20,17 +20,21 @@ var ubrGeoApp = angular
   ])
   .config(function ($routeProvider) {
     $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
+      .when('/maps/list', {
+        templateUrl: 'views/maps.html',
+        controller: 'MapsCtrl'
+      })
+      .when('/map/:mapId', {
+        templateUrl: 'views/map_detail.html',
+        controller: 'MapDetailCtrl',
       })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       })
-      .when('/maps', {
-        templateUrl: 'views/maps.html',
-        controller: 'MapsCtrl'
+      .when('/', {
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl'
       })
       .otherwise({
         redirectTo: '/'
@@ -103,4 +107,139 @@ ubrGeoApp.directive('olMap', function() {
           });
         }
     };
+});
+
+
+ubrGeoApp.directive('olMapDetail', function(tileserver,mapdetail) {
+  var MAP_DOM_ELEMENT_ID = 'mapDetail';
+  return {
+    template: '<div id="' + MAP_DOM_ELEMENT_ID + '"></div>',
+    // restrict to elements, seems necessary, contrary to the docs
+    restrict: 'E',
+    link: function postLink(scope, element, attrs) {
+      console.log('in directivein directive Map-Id: ',scope.mapId);
+      mapdetail.getPid(scope.mapId).then(function(data){ 
+        console.log('Detail: ', data);  
+        var pid = data.detail.pid;
+        console.log('pid: ', pid);
+        tileserver.getInfo(pid).then(function(data){
+          console.log('Karte: ',data); 
+          var imgHeight = data.imgHeight;
+          var imgWidth  = data.imgWidth;
+          var maxZoom   = data.maxZoom;
+          var filename = data.filename;
+          var img_projection = new ol.proj.Projection({
+            code: 'pixel',
+            units: 'm',
+            //extent: [0,0,6886,6333]  
+          });
+          var layer = new ol.layer.Tile({
+            source: new ol.source.XYZ({
+              url : 'http://digital.bib-bvb.de/ImageServer/mytile.jsp?filename='
+                + filename                    
+                + '&zoom={z}&x={x}&y={y}&rotation=0',
+              wrapX: false,
+              crossOrigin: null
+            })
+          });
+          var map = new ol.Map({
+            target: 'mapDetail',
+            layers: [
+              layer
+            ],
+            view: new ol.View({
+              // center: [10000000,10000000],
+              zoom: maxZoom
+            })
+          });
+          
+          var tileSize = 256; // [px]
+          var mapSize = map.getSize();  // The size in pixels of the map in the DOM.
+          var view = map.getView();      // The view that controls this map.
+          // extent of the whole world in pseudo mercator projection
+          // calculated from WGS 84 (lat: -180° .. 180° lon: -85° .. 85°)    
+          var extent = ol.proj.transformExtent([-180,-85,180,85], 'EPSG:4326','EPSG:3857');
+        
+          // the origin of the map content is the upper left corner 
+          // tile size is calculated from max zoom level and size of a single tile          
+          var $tileSizeTot = Math.pow(2, maxZoom) * tileSize;
+        
+          var $mapWidth  = (extent[2] - extent[0]) * imgWidth  / $tileSizeTot;
+          var $mapHeight = (extent[3] - extent[1]) * imgHeight / $tileSizeTot;
+
+          // map center 
+          var xCenter = extent[0] + $mapWidth  / 2;
+          var yCenter = extent[3] - $mapHeight / 2;
+
+          // calculate extent of the map  
+          extent[2] = extent[0] + $mapWidth;
+          extent[1] = extent[3] - $mapHeight;
+
+         
+          view.fitExtent(extent, mapSize);
+          view.setCenter([xCenter,yCenter]);
+          map.on('pointermove', function(event) {
+            var coord3857 = event.coordinate;
+            var coord4326 = ol.proj.transform(coord3857, 'EPSG:3857', 'EPSG:4326');
+            $('#mouse3857').text(ol.coordinate.toStringXY(coord3857, 2));
+            $('#mouse4326').text(ol.coordinate.toStringXY(coord4326, 4));
+          });
+        },
+        function(errorMessage){
+          $scope.error=errorMessage;
+        }); 
+      },
+      function(errorMessage){
+        $scope.error=errorMessage;
+      }); 
+    }
+  };    
+});    
+
+ubrGeoApp.factory('tileserver', function($http,$q) {
+  return { 
+    getInfo: function(pid) {
+      // Creating a deffered object
+      var deferred = $q.defer();
+      
+      $http.get(
+        'http://digipool.bib-bvb.de/bvb/anwender/CORS/get_imageinfo.pl?pid='
+            + pid
+        ).success(function(data) {  
+          //Passing data to deferred's resolve function on successful completion
+          console.log('Got new data for: ', data);
+          deferred.resolve(data);
+        }).error(function(){
+          //Sending a friendly error message in case of failure
+          deferred.reject("An error occured while fetching items");
+        });
+        
+      //Returning the promise object
+      return deferred.promise;
+    }
+  }
+});
+
+ubrGeoApp.factory('mapdetail', function($http,$q) {
+  return { 
+    getPid: function(mapId) {
+      // Creating a deffered object
+      var deferred = $q.defer();
+      
+      $http.get(
+        'http://pc1011406020.uni-regensburg.de:8888/map/' +  
+         + mapId + '/detail'    
+        ).success(function(data) {  
+          //Passing data to deferred's resolve function on successful completion
+          console.log('Got new data for: ', data);
+          deferred.resolve(data);
+        }).error(function(){
+          //Sending a friendly error message in case of failure
+          deferred.reject("An error occured while fetching PID");
+        });
+        
+      //Returning the promise object
+      return deferred.promise;
+    }
+  }
 });

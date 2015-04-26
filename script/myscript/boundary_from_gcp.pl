@@ -4,11 +4,13 @@ use Path::Tiny;
 use FindBin qw($Bin);
 use lib path($Bin)->parent(2)->child(lib)->stringify;
 use Data::Dumper;
+use English qw( -no_match_vars );   # Avoids regex performance penalty
 use Modern::Perl;
 use Getopt::Long;
 use Log::Log4perl qw(:easy);
+use Pod::Usage;
 use UBR::Geo::OGR::DataSource::Pg;
-use UBR::Geo::GCP;
+use UBR::Geo::GCP::FromFile;
 use Geo::OSR;
 
 my $logfile = path($Bin)->parent(1)->child('boundary_from_gcp.log');
@@ -23,13 +25,44 @@ Log::Log4perl->easy_init(
     },
 );
 
-my ($gcp_dir, $srs, $resolution);
+### get options
+
+my ($gcp_dir, $srs, $resolution, $opt_help, $opt_man);
 
 GetOptions (
     "gcp_dir=s"    => \$gcp_dir,
     "srs=s"        => \$srs,
     "resolution=s" => \$resolution,
-) or die("Error in command line arguments\n");
+    'help!'        => \$opt_help,
+    'man!'         => \$opt_man,
+) or pod2usage( "Try '$PROGRAM_NAME --help' for more information." );
+
+pod2usage( -verbose => 1 ) if $opt_help;
+pod2usage( -verbose => 2 ) if $opt_man;
+
+pod2usage( -verbose => 1 ) unless $gcp_dir && $srs && $resolution;
+
+
+$gcp_dir  = path($gcp_dir);
+
+INFO('Groundcontrolpoint dir: ' . $gcp_dir);
+INFO('Projection:             ' . $srs);
+INFO('Resolution:             ' . $resolution); 
+
+LOGCROAK("Directory of groundcontrolpoints doesn't exist")
+    unless $gcp_dir->is_dir;
+
+my $pg_datasource = UBR::Geo::OGR::DataSource::Pg->new();
+
+my @gcp_files = path($gcp_dir)->children( qr/\.tif\.points$/ );
+
+INFO(scalar @gcp_files, " groundcontrolpoint files found");
+
+foreach my $gcp_file (sort @gcp_files) {
+    INFO("Working  $gcp_file");
+    my $gcp = UBR::Geo::GCP::FromFile->new( file => $gcp_file );
+    write_gcps($pg_datasource, $gcp, $srs, $resolution); 
+}
 
 
 sub write_gcps {
@@ -72,7 +105,7 @@ sub write_gcps {
     $multipolygon_wld->Points($mp);
     
     INFO('Geometry created: ', $multipolygon_wld->GetGeometryName());
-ass_geo_1_1_g_d_a_l_1_1_transformer.html   INFO(' with ', scalar @{$multipolygon_wld->Points()->[0][0]}, ' Points');
+    INFO(' with ', scalar @{$multipolygon_wld->Points()->[0][0]}, ' Points');
 
     my $pg_boundary = Geo::OGR::Feature->create($pg_lyr_boundary->Schema);
     $pg_boundary->Geometry($multipolygon_wld);
@@ -106,28 +139,45 @@ ass_geo_1_1_g_d_a_l_1_1_transformer.html   INFO(' with ', scalar @{$multipolygon
     }
 }
 
-$gcp_dir  = path($gcp_dir);
+=encoding utf-8
 
-INFO('Groundcontrolpoint dir: ' . $gcp_dir);
-INFO('Projection:             ' . $srs);
-INFO('Resolution:             ' . $resolution); 
+=head1 NAME
+ 
+boundary_from_gcp.pl - build a boundary around map content  
 
-LOGCROAK("Directory of groundcontrolpoints doesn't exist")
-    unless $gcp_dir->is_dir;
-LOGCROAK("No projection given")
-    unless $srs;
-LOGCORAK("No resolution given")
-    unless $resolution;
+=head1 SYNOPSIS
 
-my $pg_datasource = UBR::Geo::OGR::DataSource::Pg->new();
+boundary_from_gcp.pl [options]  
 
-my @gcp_files = path($gcp_dir)->children( qr/\.tif\.points$/ );
+ Options:
+   --help         display this help and exit
+   --man          display extensive help
 
-INFO(scalar @gcp_files, " groundcontrolpoint files found");
+   --gcp_dir      directory of files with ground control points (GCPs)
+   --srs          spatial reference system (SRS)
+   --resolution   resolution of scanned images
 
-foreach my $gcp_file (sort @gcp_files) {
-    INFO("Working  $gcp_file");
-    my $gcp = UBR::Geo::GCP->new( file => $gcp_file );
-    write_gcps($pg_datasource, $gcp, $srs, $resolution); 
-}
+ Examples:
+   boundary_from_gcp.pl --gcp_dir t/input_files --srs 3857 --resolution 400  
+   boundary_from_gcp.pl --help
+   boundary_from_gcp.pl --man 
+   
 
+=head1 DESCRIPTION
+
+Build a boundary around map content based on ground control points  
+
+If a map has a graticule with intersections on the 4 corners of
+the map, the ground control points (GCP) can be set on the corners and 
+the GCPs build a rectangular describing the map content. 
+
+=head1 AUTHOR
+
+Albert Schröder <albert.schroeder@ur.de>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

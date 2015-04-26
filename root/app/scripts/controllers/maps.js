@@ -8,7 +8,7 @@
  * Controller of the ubrGeoApp
  */
 angular.module('ubrGeoApp')
-  .controller('MapsCtrl', function ($scope, $http, $routeParams, $timeout) {
+  .controller('MapsCtrl', function ($scope, $http, $routeParams, $window, $location) {
 
     var bbox_str = $routeParams.bbox; 
     var bbox     = bbox_str.split(',');
@@ -41,9 +41,9 @@ angular.module('ubrGeoApp')
          $http.get('http://pc1011406020.uni-regensburg.de:8888/map/' + boundary_id + '/boundary').success(function( data ) {
             var vectorLayer = $scope.vectorLayer;
             var olMap = $scope.olMap;
-//             if ( typeof vectorLayer !== "undefined" ) {
-//                 olMap.removeLayer(vectorLayer)
-//             }
+             if ( typeof vectorLayer !== "undefined" ) {
+                 olMap.removeLayer(vectorLayer)
+             }
              // console.log(data);
              var geojsonSource = new ol.source.GeoJSON({
                  projection: 'EPSG:3857',
@@ -57,14 +57,54 @@ angular.module('ubrGeoApp')
          });
        }
 
-      $scope.leave = function() {
-          console.log('table left: ', $scope.extent);
-          var vectorLayer = $scope.vectorLayer;
-          var olMap = $scope.olMap;
-          if ( typeof vectorLayer !== "undefined" ) {
-              olMap.removeLayer(vectorLayer)
-          }
-      }
+    $scope.leave = function() {
+        console.log('table left: ', $scope.extent);
+        var vectorLayer = $scope.vectorLayer;
+        var olMap = $scope.olMap;
+        if ( typeof vectorLayer !== "undefined" ) {
+            olMap.removeLayer(vectorLayer)
+        }
+    }
+
+    $scope.open = function(map) {
+        console.log(map);
+        var map_id = map.map_id;
+        console.log(map_id);
+        var olMap = $scope.olMap;
+        var view = olMap.getView();
+        var center = view.getCenter();
+        console.log(center);
+        var x = center[0];
+        var y = center[1];
+        console.log('x: ',x,' y: ',y);
+        //var pixel_x;
+        //var pixel_y;
+        $http.get('http://pc1011406020.uni-regensburg.de:8888/map/' 
+                + map_id + '/geotransform' + '?x=' + x + '&y=' + y 
+                + '&invers=1&srid=3857'
+        ).success(function(data) {
+            console.log(data.pixel); 
+            $scope.pixel_x = data.pixel[0];
+            $scope.pixel_y = data.pixel[1];
+            console.log('pixel_x: ', $scope.pixel_x, ' pixel_y: ', $scope.pixel_y);
+            var pid = map.pid;
+            $scope.pid = pid;
+            console.log('pid: ', pid);
+            if (pid) {
+                var url = 'http://bvbm1.bib-bvb.de/webclient/DeliveryManager'
+                    + '?custom_att_2=simple_viewer&pid='
+                    + pid 
+                    + '&x=' + $scope.pixel_x + '&y=' + $scope.pixel_y +  '&res=2';
+                // console.log('url: ',url);
+                // console.log('$window: ', $window);
+                $location.path('/map/'+ map_id);
+                //var $win = $window.open(url);
+                //console.log('Window: ',$win);
+            } else {
+               alert('Karte nicht online');
+            }
+        });
+    }
 
     $scope.pageChanged = function(newpage) {
         console.log('current: ', $scope.currentPage);

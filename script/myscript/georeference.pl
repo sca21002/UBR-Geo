@@ -11,19 +11,25 @@ use Capture::Tiny ':all';
 use Getopt::Long;
 use Log::Log4perl qw(:easy);
 use Remedi::Imagefile;
-use UBR::Geo::GCP;
+use UBR::Geo::GCP::FromFile;
+use English qw( -no_match_vars );   # Avoids regex performance penalty
+use Pod::Usage;
 
-my $gcp_dir;
-my $tiff_src;
-my $tiff_dst;
-my $srs;
+my ($gcp_dir, $tiff_src, $tiff_dst, $srs, $opt_help, $opt_man); 
 
 GetOptions (
     "gcp_dir=s"   => \$gcp_dir,
     "tiff_src=s"  => \$tiff_src,
     "tiff_dst=s"  => \$tiff_dst,
     "srs=s"       => \$srs,
-) or die("Error in command line arguments\n");
+    'help!'       => \$opt_help,
+    'man!'        => \$opt_man,
+) or pod2usage( "Try '$PROGRAM_NAME --help' for more information." );
+
+pod2usage( -verbose => 1 ) if $opt_help;
+pod2usage( -verbose => 2 ) if $opt_man;
+
+pod2usage( -verbose => 1 ) unless $gcp_dir && $tiff_src && $tiff_dst;
 
 my $logfile = path($Bin)->parent(1)->child('georeference.log');
 
@@ -54,13 +60,13 @@ LOGCROAK("Directory of TIFF source files doesn't exist")
     unless $tiff_src->is_dir;
 $tiff_dst->mkpath() unless $tiff_dst->is_dir;
 
-my @gcp_files = path($gcp_dir)->children( qr/\.tif\.points$/ );
+my @gcp_files = path($gcp_dir)->children( qr/\.(.{3})\.points$/ );
 
 INFO(scalar @gcp_files, " groundcontrolpoint files found");
 
 foreach my $gcp_file (@gcp_files) {
     INFO("Working  $gcp_file");
-    my $gcp = UBR::Geo::GCP->new( file => $gcp_file );
+    my $gcp = UBR::Geo::GCP::FromFile->new( file => $gcp_file );
     write_gcps($gcp);
 }
 
@@ -120,10 +126,10 @@ sub write_gcps {
     foreach my $coord (@coords) {
         push @options, '-gcp';
         push @options, 
-            sprintf("%.6g",   $coord->{GCPPixel}),
-            sprintf("%.6g", - $coord->{GCPLine}),
-            sprintf("%.6g",   $coord->{GCPX}),
-            sprintf("%.6g",   $coord->{GCPY}),
+            sprintf("%.6g", $coord->{pixel}),
+            sprintf("%.6g", $coord->{line}),
+            sprintf("%.6g", $coord->{x}   ),
+            sprintf("%.6g", $coord->{y}   ),
         ;
     }
     INFO(join ' ', $cmd, @options);
@@ -159,3 +165,47 @@ sub write_gcps {
     }
 }
 
+=encoding utf-8
+
+=head1 NAME
+ 
+georeference.pl - Add georeferencing data to TIFF files   
+
+=head1 SYNOPSIS
+
+georeference.pl [options]  
+
+ Options:
+   --help         display this help and exit
+   --man          display extensive help
+
+   --gcp_dir      directory of groundcontrolpoint files
+   --tiff_src     directory of TIFF source files
+   --tiff_dst     directory of TIFF destination files
+   --srs          spatial reference system 
+                  default: EPSG:3857
+ Examples:
+   georeference.pl --gcp_dir UBR-Geo/gcp/ubr15411 --tiff_src ubr15411/mst/tif --tiff_dst ubr15411/geo  
+   georeference.pl --help
+   georeference.pl --man 
+   
+
+=head1 DESCRIPTION
+
+Add georeferencing data to TIFF files   
+
+Maps georeferenced with QGIS and georef data are stored as groundcontrol 
+points in text files. This files are read and the georeferencing data are 
+add to the TIFF headers of archive TIFF files according to the GeoTIFF 
+standard.
+
+=head1 AUTHOR
+
+Albert Schröder <albert.schroeder@ur.de>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

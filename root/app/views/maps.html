@@ -1,36 +1,31 @@
 <div class="container-fluid" id="content">
   <div class="row">    
-    <div class="col-md-6">
+    <div class="col-md-7">
       <div id="map-container">
         <ol-map ng-mouseenter="mapEntered()" ng-mouseleave="mapLeft()"></ol-map>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-5">
        <div id="grid-container">
-        <table class="table table-bordered table-hover">
-          <thead> 
-            <tr>
+        <table class="table table-condensed table-hover">
+<!--          <thead> 
+           <tr>
               <td colspan="2"> 
                    {{totalMaps}} Karten gefunden
               </td>    
-            <tr> 
-             <th>Vorschaubild</th>
-             <th>Signatur</th>
-             <th>Maßstab</th>    
-            </tr>
           </thead>
-          <tfoot>
+-->
+        <tfoot>
             <tr>
-              <td colspan="3" class="text-center">
-                 <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>  
+              <td colspan="2" class="text-center">
+                 <dir-pagination-controls max-size=7 on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>  
               </td>    
             </tr>    
           </tfoot>    
           <tbody ng-mouseleave="leave()">    
           <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)" dir-paginate="map in maps | itemsPerPage: 5" current-page="currentPage" total-items="totalMaps">
-              <td><img ng-src="http://digital.bib-bvb.de/webclient/DeliveryManager?pid={{map.url}}&custom_att_2=thumbnailstream"></td>
-              <td>{{map.filename}}</td>  
-              <td>{{map.scale}}</td> 
+              <td><img id="thumbnail-map" ng-src="http://digital.bib-bvb.de/webclient/DeliveryManager?pid={{map.pid}}&custom_att_2=thumbnailstream"></td>
+              <td class="map-row">{{map.isbd}} </td>  
             </tr>
           </tbody>  
         </table>  
