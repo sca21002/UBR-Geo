@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
 
+0.005     2015-04-26 12:42:20+02:00 Europe/Berlin
+
     - Add map detail view
       tiles from digitool are fetched and displayed with Openlayers3 
 
