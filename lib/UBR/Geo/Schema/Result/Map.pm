@@ -170,6 +170,19 @@ __PACKAGE__->table("maps");
   is_nullable: 1
   size: 11
 
+=head2 project_id
+
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 1
+
+=head2 isil
+
+  data_type: 'varchar'
+  is_foreign_key: 1
+  is_nullable: 1
+  size: 16
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -228,6 +241,10 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 1 },
   "bvnr",
   { data_type => "varchar", is_nullable => 1, size => 11 },
+  "project_id",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
+  "isil",
+  { data_type => "varchar", is_foreign_key => 1, is_nullable => 1, size => 16 },
 );
 
 =head1 PRIMARY KEY
@@ -308,9 +325,49 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 isil
 
-# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-04-05 15:16:04
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KiDtdcCj9Oi6GbA9AVLecg
+Type: belongs_to
+
+Related object: L<UBR::Geo::Schema::Result::Library>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "isil",
+  "UBR::Geo::Schema::Result::Library",
+  { isil => "isil" },
+  {
+    is_deferrable => 0,
+    join_type     => "LEFT",
+    on_delete     => "RESTRICT",
+    on_update     => "CASCADE",
+  },
+);
+
+=head2 project
+
+Type: belongs_to
+
+Related object: L<UBR::Geo::Schema::Result::Project>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "project",
+  "UBR::Geo::Schema::Result::Project",
+  { id => "project_id" },
+  {
+    is_deferrable => 0,
+    join_type     => "LEFT",
+    on_delete     => "RESTRICT",
+    on_update     => "CASCADE",
+  },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-04-28 18:41:08
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LQZimTOYbe+xeGnnwTNIRQ
 
 use Geo::JSON;
 use Geo::JSON::Feature;

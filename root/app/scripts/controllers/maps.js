@@ -20,34 +20,36 @@ angular.module('ubrGeoApp')
     $scope.extent[1] = parseFloat(bbox[1]);
     $scope.extent[2] = parseFloat(bbox[2]);
     $scope.extent[3] = parseFloat(bbox[3]);
-    console.log('MapsCtrl: ', $scope.extent);
 
-    $scope.getData = function getData(page, extent) {
+    $scope.projects = [
+      { short: "",       name: "alle Karten" },
+      { short: "BLO",        name: "Bayerischer Landesbibliothek Online" },
+      { short: "GeoPortOst", name: "GeoPortOst" },
+    ];
+    $scope.project = $scope.projects[0]; // alle
+    
+    $scope.getData = function getData(page, extent, project) {
+        console.log('Projekt: ', project);
         $http.get(
 	    'http://pc1011406020.uni-regensburg.de:8888/map/list?bbox=' + 
                    extent.join(',') +
-                   '&page=' + page 
+                   '&page=' + page
+                   + '&project=' + project.short
         ).success(function(data) {  
-            console.log('Got new data for: ', extent);
             $scope.maps = data.maps;
             $scope.totalMaps = data.maps_total;
             $scope.currentPage = parseInt(data.page);    
         });
     }  
 
-     $scope.hover = function(map) {
-         // console.log(map);
+    $scope.hover = function(map) {
          var boundary_id = map.map_id;
-         // console.log(boundary_id);
- 
- 
          $http.get('http://pc1011406020.uni-regensburg.de:8888/map/' + boundary_id + '/boundary').success(function( data ) {
             var vectorLayer = $scope.vectorLayer;
             var olMap = $scope.olMap;
              if ( typeof vectorLayer !== "undefined" ) {
                  olMap.removeLayer(vectorLayer)
              }
-             // console.log(data);
              var geojsonSource = new ol.source.GeoJSON({
                  projection: 'EPSG:3857',
                  'object': data
@@ -61,7 +63,6 @@ angular.module('ubrGeoApp')
        }
 
     $scope.leave = function() {
-        console.log('table left: ', $scope.extent);
         var vectorLayer = $scope.vectorLayer;
         var olMap = $scope.olMap;
         if ( typeof vectorLayer !== "undefined" ) {
@@ -70,39 +71,26 @@ angular.module('ubrGeoApp')
     }
 
     $scope.open = function(map) {
-        console.log(map);
         var map_id = map.map_id;
-        console.log(map_id);
         var olMap = $scope.olMap;
         var view = olMap.getView();
         var center = view.getCenter();
-        console.log(center);
         var x = center[0];
         var y = center[1];
-        console.log('x: ',x,' y: ',y);
-        //var pixel_x;
-        //var pixel_y;
         $http.get('http://pc1011406020.uni-regensburg.de:8888/map/' 
                 + map_id + '/geotransform' + '?x=' + x + '&y=' + y 
                 + '&invers=1&srid=3857'
         ).success(function(data) {
-            console.log(data.pixel); 
             $scope.pixel_x = data.pixel[0];
             $scope.pixel_y = data.pixel[1];
-            console.log('pixel_x: ', $scope.pixel_x, ' pixel_y: ', $scope.pixel_y);
             var pid = map.pid;
             $scope.pid = pid;
-            console.log('pid: ', pid);
             if (pid) {
                 var url = 'http://bvbm1.bib-bvb.de/webclient/DeliveryManager'
                     + '?custom_att_2=simple_viewer&pid='
                     + pid 
                     + '&x=' + $scope.pixel_x + '&y=' + $scope.pixel_y +  '&res=2';
-                // console.log('url: ',url);
-                // console.log('$window: ', $window);
                 $location.path('/map/'+ map_id);
-                //var $win = $window.open(url);
-                //console.log('Window: ',$win);
             } else {
                alert('Karte nicht online');
             }
@@ -110,16 +98,17 @@ angular.module('ubrGeoApp')
     }
 
     $scope.pageChanged = function(newpage) {
-        console.log('current: ', $scope.currentPage);
-        console.log('newpage: ', newpage);
-        // if ($scope.currentPage !== newpage) {
-        console.log('get new data in page_changed');
-        $scope.getData(newpage,$scope.extent);
-      //}
+        $scope.getData(newpage,$scope.extent,$scope.project);
     } 
     $scope.pageChanged(1);
 
-
+//    $scope.change = function() {
+//        console.log('Changed: ', $scope.project);
+//        $scope.getData(1, $scope.extent,$scope.project);
+//    }
+//    $scope.$watch($scope.Data, function() {
+//        console.log('Data in maps: ', $scope.Data.project);    
+//    });
 
 //
 //    $scope.mapEntered = function() {

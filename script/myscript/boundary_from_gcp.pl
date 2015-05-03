@@ -27,11 +27,11 @@ Log::Log4perl->easy_init(
 
 ### get options
 
-my ($gcp_dir, $srs, $resolution, $opt_help, $opt_man);
+my ($gcp_dir, $srid, $resolution, $opt_help, $opt_man);
 
 GetOptions (
     "gcp_dir=s"    => \$gcp_dir,
-    "srs=s"        => \$srs,
+    "srid=s"       => \$srid,
     "resolution=s" => \$resolution,
     'help!'        => \$opt_help,
     'man!'         => \$opt_man,
@@ -40,13 +40,13 @@ GetOptions (
 pod2usage( -verbose => 1 ) if $opt_help;
 pod2usage( -verbose => 2 ) if $opt_man;
 
-pod2usage( -verbose => 1 ) unless $gcp_dir && $srs && $resolution;
+pod2usage( -verbose => 1 ) unless $gcp_dir && $srid && $resolution;
 
 
 $gcp_dir  = path($gcp_dir);
 
 INFO('Groundcontrolpoint dir: ' . $gcp_dir);
-INFO('Projection:             ' . $srs);
+INFO('Projection:             ' . $srid);
 INFO('Resolution:             ' . $resolution); 
 
 LOGCROAK("Directory of groundcontrolpoints doesn't exist")
@@ -61,12 +61,12 @@ INFO(scalar @gcp_files, " groundcontrolpoint files found");
 foreach my $gcp_file (sort @gcp_files) {
     INFO("Working  $gcp_file");
     my $gcp = UBR::Geo::GCP::FromFile->new( file => $gcp_file );
-    write_gcps($pg_datasource, $gcp, $srs, $resolution); 
+    write_gcps($pg_datasource, $gcp, $srid, $resolution); 
 }
 
 
 sub write_gcps {
-    my ($pg_datasource, $gcp, $srs, $resolution) = @_; 
+    my ($pg_datasource, $gcp, $srid, $resolution) = @_; 
 
     my $pg_lyr_boundary = $pg_datasource->get_layer('boundaries(boundary_wld)');
     my $pg_lyr_map = $pg_datasource->get_layer('maps');
@@ -96,7 +96,7 @@ sub write_gcps {
 
     $multipolygon_wld->Segmentize($gcp->segment_length);
 
-    my $src = Geo::OSR::SpatialReference->create(EPSG => $srs); 
+    my $src = Geo::OSR::SpatialReference->create(EPSG => $srid); 
     my $dst = Geo::OSR::SpatialReference->create(EPSG => 3857);
     my $transform = Geo::OSR::CoordinateTransformation->new($src, $dst);
     
@@ -154,11 +154,11 @@ boundary_from_gcp.pl [options]
    --man          display extensive help
 
    --gcp_dir      directory of files with ground control points (GCPs)
-   --srs          spatial reference system (SRS)
+   --srid         spatial reference system (SRID)
    --resolution   resolution of scanned images
 
  Examples:
-   boundary_from_gcp.pl --gcp_dir t/input_files --srs 3857 --resolution 400  
+   boundary_from_gcp.pl --gcp_dir t/input_files --srid 3857 --resolution 400  
    boundary_from_gcp.pl --help
    boundary_from_gcp.pl --man 
    

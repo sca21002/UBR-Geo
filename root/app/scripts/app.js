@@ -35,9 +35,6 @@ var ubrGeoApp = angular
       .otherwise({
         redirectTo: '/maps/list'
       });
-  })
-  .run(function($rootScope){
-    $rootScope.mapId = 1;
   });
 
 // Template for pagination
@@ -74,35 +71,28 @@ ubrGeoApp.directive('olMap', function() {
               zoom: 2
             })
           });
-          console.log('map directive: ', scope.extent);
           var extent_3857 = ol.proj.transformExtent(scope.extent, 'EPSG:4326', 'EPSG:3857');
-          console.log('init extent (3857): ', extent_3857);
           var olMap = scope.olMap;
           var view = olMap.getView();
           var size = olMap.getSize();
           view.fitExtent(extent_3857, size);
           extent_3857 = view.calculateExtent( size );
-          console.log('fit extent (3857): ',  extent_3857); 
           scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
           scope.resolution = view.getResolution();
-          console.log('fit extent: ', scope.extent, ' res: ', scope.resolution);
           scope.changeres = view.on('change:resolution', function(evt) {
-              console.log('Resolution: ', view.getResolution() );
               var extent_3857 = view.calculateExtent( olMap.getSize() );
-              console.log('Extent (3857): ', extent_3857);
               scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
-              console.log('Resolution changed: ', scope.extent);
               scope.currentPage = 1;
-              scope.getData(scope.currentPage, scope.extent);
+              scope.project = { short: "", name: "alle Karten"};
+              scope.getData(scope.currentPage, scope.extent, scope.project);
           });     
           olMap.on('moveend', function(evt) {
               var map = evt.map;
               var extent_3857 = map.getView().calculateExtent(map.getSize()); 
-              console.log('Extent (3857): ', extent_3857);
               scope.extent = ol.proj.transformExtent(extent_3857, 'EPSG:3857', 'EPSG:4326');
-              console.log('Center changed: ', scope.extent);
               scope.currentPage = 1;
-              scope.getData(scope.currentPage, scope.extent);
+              scope.project = { short: "", name: "alle Karten"};
+              scope.getData(scope.currentPage, scope.extent, scope.project);
           });
         }
     };
@@ -116,13 +106,9 @@ ubrGeoApp.directive('olMapDetail', function(tileserver,mapdetail) {
     // restrict to elements, seems necessary, contrary to the docs
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
-      console.log('in directivein directive Map-Id: ',scope.mapId);
       mapdetail.getPid(scope.mapId).then(function(data){ 
-        console.log('Detail: ', data);  
         var pid = data.detail.pid;
-        console.log('pid: ', pid);
         tileserver.getInfo(pid).then(function(data){
-          console.log('Karte: ',data); 
           var imgHeight = data.imgHeight;
           var imgWidth  = data.imgWidth;
           var maxZoom   = data.maxZoom;
@@ -130,7 +116,6 @@ ubrGeoApp.directive('olMapDetail', function(tileserver,mapdetail) {
           var img_projection = new ol.proj.Projection({
             code: 'pixel',
             units: 'm',
-            //extent: [0,0,6886,6333]  
           });
           var layer = new ol.layer.Tile({
             source: new ol.source.XYZ({
@@ -147,7 +132,6 @@ ubrGeoApp.directive('olMapDetail', function(tileserver,mapdetail) {
               layer
             ],
             view: new ol.View({
-              // center: [10000000,10000000],
               zoom: maxZoom
             })
           });
@@ -206,7 +190,6 @@ ubrGeoApp.factory('tileserver', function($http,$q) {
             + pid
         ).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
-          console.log('Got new data for: ', data);
           deferred.resolve(data);
         }).error(function(){
           //Sending a friendly error message in case of failure
@@ -230,7 +213,6 @@ ubrGeoApp.factory('mapdetail', function($http,$q) {
          + mapId + '/detail'    
         ).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
-          console.log('Got new data for: ', data);
           deferred.resolve(data);
         }).error(function(){
           //Sending a friendly error message in case of failure
@@ -241,4 +223,10 @@ ubrGeoApp.factory('mapdetail', function($http,$q) {
       return deferred.promise;
     }
   }
+});
+
+ubrGeoApp.factory('Data', function() {
+    return {
+        project:  '' , 
+    };             
 });

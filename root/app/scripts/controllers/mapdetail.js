@@ -9,8 +9,6 @@
  */
 angular.module('ubrGeoApp')
   .controller('MapDetailCtrl', function ($scope, $rootScope, $routeParams) {
-   console.log('Detail - mapId: ', $scope.mapId);
-   console.log('Map-ID: ', $routeParams.mapId);    
    $scope.mapId = $routeParams.mapId;  
    $rootScope.mapId = $routeParams.mapId;
 });

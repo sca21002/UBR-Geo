@@ -1,6 +1,14 @@
 <div class="container-fluid" id="content">
   <div class="row">    
     <div class="col-md-7">
+        <form role="search">
+          <div class="form-group">    
+            <label>Projekt:
+               <select class="form-control" ng-options="project.name for project in projects" ng-change="change()">
+              </select>
+            </label><br/>
+          </div>
+        </form>
       <div id="map-container">
         <ol-map ng-mouseenter="mapEntered()" ng-mouseleave="mapLeft()"></ol-map>
       </div>

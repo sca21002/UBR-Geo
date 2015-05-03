@@ -38,7 +38,9 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     my ($self, $c) = @_;
 
     my $bbox = $c->req->params->{bbox} || '8.98,47.27,13.83,50.56';
-    
+    my $isil = $c->req->params->{isil};
+    my $project = $c->req->params->{project}; 
+
     $c->log->debug('BBox: ' . $bbox);
     my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
 
@@ -47,11 +49,13 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     my $entries_per_page = 5;
 
     my $map_rs = $c->stash->{map_rs}->intersects_with_bbox(
-	{ 
-	    xmin => $xmin, 
-            ymin => $ymin, 
-            xmax => $xmax,
-            ymax =>  $ymax,
+	    { 
+	        xmin    => $xmin, 
+            ymin    => $ymin, 
+            xmax    => $xmax,
+            ymax    => $ymax,
+            isil    => $isil,
+            project => $project,
         },
         {
             page => $page,

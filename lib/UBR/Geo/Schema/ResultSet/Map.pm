@@ -22,6 +22,8 @@ sub intersects_with_bbox {
     my $ymin = delete $cond->{ymin};
     my $xmax = delete $cond->{xmax};
     my $ymax = delete $cond->{ymax};
+    my $project = delete $cond->{project};
+    delete $cond->{isil} unless $cond->{isil};
     my $srt  = 4326; 
 
     my $envelope   = 'ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?), 3857)';
@@ -30,9 +32,15 @@ sub intersects_with_bbox {
     my $area_intsec_sqr = $area_intsec . ' ^ 3';
     my $area_query = "ST_Area(ST_Transform(ST_MakeEnvelope(?,$ymin,$xmax,$ymax,$srt),3857)) ^ 2";
 
+    my $join = [ 'boundary' ];
+    if ($project) {
+        push @$join, 'project' if $project;
+        $cond = { %$cond, 'project.short' => $project };
+    }
+
     $attrs = {
     	%$attrs,
-        join   => [ 'boundary' ],
+        join   => $join,
 #        select => [ qw( map_id mab331 mab425a call_number filename scale pid ), 
 #        ], 
 #        as     => [ qw( map_id title year call_number filename scale pid ) ],
@@ -53,6 +61,7 @@ sub intersects_with_bbox {
          scale => { '>' => 0 },
          # fid   => { '<' => 954 },
          # filename => { 'like' => 'ubr05510%' },
+         $cond,
         ]}, 
         $attrs,
     );

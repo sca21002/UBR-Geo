@@ -15,13 +15,13 @@ use UBR::Geo::GCP::FromFile;
 use English qw( -no_match_vars );   # Avoids regex performance penalty
 use Pod::Usage;
 
-my ($gcp_dir, $tiff_src, $tiff_dst, $srs, $opt_help, $opt_man); 
+my ($gcp_dir, $tiff_src, $tiff_dst, $srid, $opt_help, $opt_man); 
 
 GetOptions (
     "gcp_dir=s"   => \$gcp_dir,
     "tiff_src=s"  => \$tiff_src,
     "tiff_dst=s"  => \$tiff_dst,
-    "srs=s"       => \$srs,
+    "srid=s"       => \$srid,
     'help!'       => \$opt_help,
     'man!'        => \$opt_man,
 ) or pod2usage( "Try '$PROGRAM_NAME --help' for more information." );
@@ -46,13 +46,13 @@ Log::Log4perl->easy_init(
 $gcp_dir  = path($gcp_dir);
 $tiff_src = path($tiff_src);
 $tiff_dst = path($tiff_dst);
-$srs    ||= 'EPSG:3857'; 
+$srid   ||= 'EPSG:3857'; 
 
 
 INFO('Groundcontrolpoint dir: ' . $gcp_dir);
 INFO('TIFF source dir:        ' . $tiff_src);
 INFO('TIFF destintation dir:  ' . $tiff_dst);
-INFO('Projection:             ' . $srs);
+INFO('Projection:             ' . $srid);
 
 LOGCROAK("Directory of groundcontrolpoints doesn't exist")
     unless $gcp_dir->is_dir;
@@ -66,7 +66,7 @@ INFO(scalar @gcp_files, " groundcontrolpoint files found");
 
 foreach my $gcp_file (@gcp_files) {
     INFO("Working  $gcp_file");
-    my $gcp = UBR::Geo::GCP::FromFile->new( file => $gcp_file );
+    my $gcp = UBR::Geo::GCP::FromFile->new( file => $gcp_file, srid => $srid );
     write_gcps($gcp);
 }
 
@@ -120,7 +120,7 @@ sub write_gcps {
     
     my @options = (
         -of   => 'GTiff',
-        -a_srs => $srs, 
+        -a_srs => $srid, 
     ); 
     
     foreach my $coord (@coords) {
@@ -182,7 +182,7 @@ georeference.pl [options]
    --gcp_dir      directory of groundcontrolpoint files
    --tiff_src     directory of TIFF source files
    --tiff_dst     directory of TIFF destination files
-   --srs          spatial reference system 
+   --srid         spatial reference identifier 
                   default: EPSG:3857
  Examples:
    georeference.pl --gcp_dir UBR-Geo/gcp/ubr15411 --tiff_src ubr15411/mst/tif --tiff_dst ubr15411/geo  

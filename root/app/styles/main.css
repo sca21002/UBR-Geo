@@ -18,11 +18,22 @@
     padding-top: 7px;
 }
 
+.navbar-form {
+    margin-bottom: 0px;
+    margin-top: 3px;
+}
+
+.form-control {
+    padding-bottom: 3px;
+    padding-top: 3px;
+    height: 50%;
+}
+
 #mapDetail {
     border: 2px solid #cc0000;
 }
 
-#thumbnail-map {
+.thumbnail-map {
     height: 75px;
 }
 

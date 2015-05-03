@@ -28,11 +28,11 @@ Log::Log4perl->easy_init(
 
 ### get options
 
-my ($gcp_dir, $srs, $opt_help, $opt_man);
+my ($gcp_dir, $srid, $opt_help, $opt_man);
 
 GetOptions (
     "gcp_dir=s"    => \$gcp_dir,
-    "srs=s"        => \$srs,
+    "srid=s"        => \$srid,
     'help!'        => \$opt_help,
     'man!'         => \$opt_man,
 ) or pod2usage( "Try '$PROGRAM_NAME --help' for more information." );
@@ -40,13 +40,13 @@ GetOptions (
 pod2usage( -verbose => 1 ) if $opt_help;
 pod2usage( -verbose => 2 ) if $opt_man;
 
-pod2usage( -verbose => 1 ) unless $gcp_dir && $srs;
+pod2usage( -verbose => 1 ) unless $gcp_dir && $srid;
 
 
 $gcp_dir  = path($gcp_dir);
 
 INFO('Groundcontrolpoint dir: ' . $gcp_dir);
-INFO('Projection:             ' . $srs);
+INFO('Projection:             ' . $srid);
 
 LOGCROAK("Directory of groundcontrolpoints doesn't exist")
     unless $gcp_dir->is_dir;
@@ -61,13 +61,13 @@ foreach my $gcp_file (sort @gcp_files) {
     INFO("Working  $gcp_file");
     my $gcp = UBR::Geo::GCP::FromFile->new( file => $gcp_file );
     my ($filename) = $gcp_file->basename =~ qr/([^.]*)\..{3}\.points$/;
-    write_gcps($filename, $schema, $gcp, $srs); 
+    write_gcps($filename, $schema, $gcp, $srid); 
     #last;
 }
 
 
 sub write_gcps {
-    my ($filename, $schema, $gcp, $srs) = @_; 
+    my ($filename, $schema, $gcp, $srid) = @_; 
 
     INFO("Filename: '$filename'");
     my $map = $schema->resultset('Map')->search({
@@ -79,7 +79,7 @@ sub write_gcps {
         delete $_->{id};            # remove column id
         +{ %$_, 
            map_id => $map->map_id,  # add column map_id       
-           srid   => $srs,          # add column srid (spatial ref)  
+           srid   => $srid,          # add column srid (spatial ref)  
         }
     } @$column; 
     #say Dumper($column);
@@ -102,10 +102,10 @@ gcp_to_database.pl [options]
    --man          display extensive help
 
    --gcp_dir      directory of files with ground control points (GCPs)
-   --srs          spatial reference system (SRS)
+   --srid         spatial reference identifier (SRID)
 
  Examples:
-   gcp_to_database.pl --gcp_dir t/input_files --srs 3857  
+   gcp_to_database.pl --gcp_dir t/input_files --srid 3857  
    gcp_to_database.pl --help
    gcp_to_database.pl --man 
    
