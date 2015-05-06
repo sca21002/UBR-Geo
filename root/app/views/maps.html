@@ -1,42 +1,39 @@
-<div class="container-fluid" id="content">
-  <div class="row">    
-    <div class="col-md-7">
-        <form role="search">
-          <div class="form-group">    
-            <label>Projekt:
-               <select class="form-control" ng-options="project.name for project in projects" ng-change="change()">
-              </select>
-            </label><br/>
+  <div class="row">
+      <div class="col-md-7">
+          <div id="maptitle">
+          Karten: {{totalMaps}} Seite: {{currentPage}}/{{numPages}} 
           </div>
-        </form>
-      <div id="map-container">
-        <ol-map ng-mouseenter="mapEntered()" ng-mouseleave="mapLeft()"></ol-map>
-      </div>
-    </div>
-    <div class="col-md-5">
-       <div id="grid-container">
+        <ol-map id="ol-map"></ol-map>   
+      </div> 
+      <div class="col-md-5">
         <table class="table table-condensed table-hover">
-<!--          <thead> 
+        <thead> 
            <tr>
               <td colspan="2"> 
-                   {{totalMaps}} Karten gefunden
+                  Karten: {{totalMaps}} Seite: {{currentPage}}/{{numPages}}  
               </td>    
           </thead>
--->
         <tfoot>
             <tr>
               <td colspan="2" class="text-center">
-                 <dir-pagination-controls max-size=7 on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>  
+                  <pagination 
+                    ng-model="currentPage" 
+                    total-items="totalMaps"
+                    max-size = 6
+                    items-per-page = 5
+                    num-pages="numPages"
+                    ng-change="pageChanged()"
+                  ></pagination>
               </td>    
             </tr>    
           </tfoot>    
           <tbody ng-mouseleave="leave()">    
-          <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)" dir-paginate="map in maps | itemsPerPage: 5" current-page="currentPage" total-items="totalMaps">
-              <td><img id="thumbnail-map" ng-src="http://digital.bib-bvb.de/webclient/DeliveryManager?pid={{map.pid}}&custom_att_2=thumbnailstream"></td>
+          <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)">
+              <td><img class="thumbnail-map" ng-src="{{map.icon}}"/></td>
               <td class="map-row">{{map.isbd}} </td>  
-            </tr>
+          </tr>
           </tbody>  
         </table>  
-    </div>   
-  </div>  
-</div>  
+      </div>    
+  </div>    
+</div>    

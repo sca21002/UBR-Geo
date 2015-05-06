@@ -9,20 +9,31 @@ use Data::Dumper;
 
 BEGIN {
     use_ok('UBR::Geo::GCP::FromDB') or exit;
-    use_ok('UBR::Geo::Geotransform') or exit;
+    use_ok('UBR::Geo::Geotransform::FromDB') or exit;
 }
-
-
 
 my $gcp = UBR::Geo::GCP::FromDB ->new(
 	filename => 'ubr15411_0134',
 );
 
-
-my $geotransform = UBR::Geo::Geotransform->new_from_gcps($gcp);
+my $geotransform = UBR::Geo::Geotransform::FromDB->new({gcp => $gcp});
 
 my ($x,$y) = $geotransform->transform_invers(12.053,48.941,4326); 
 
 diag(Dumper($x,$y));
+
+#$gcp = UBR::Geo::GCP::FromDB ->new(
+#	filename => '12_Mapp_XI_42_f_I_10',
+#);
+#
+#
+#$geotransform = UBR::Geo::Geotransform->new_from_gcps($gcp);
+#
+#my ($x,$y) = $geotransform->transform_invers(4503140,5421914,31468); 
+#
+#diag(Dumper($x,$y));
+
+
+
 
 done_testing();

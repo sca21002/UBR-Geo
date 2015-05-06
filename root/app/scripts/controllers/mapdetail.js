@@ -2,13 +2,12 @@
 
 /**
  * @ngdoc function
- * @name ubrGeoApp.controller:MapDetailCtrl
+ * @name ngMapApp.controller:MapdetailCtrl
  * @description
- * # MapDetailCtrl
- * Controller of the ubrGeoApp
+ * # MapdetailCtrl
+ * Controller of the ngMapApp
  */
-angular.module('ubrGeoApp')
-  .controller('MapDetailCtrl', function ($scope, $rootScope, $routeParams) {
-   $scope.mapId = $routeParams.mapId;  
-   $rootScope.mapId = $routeParams.mapId;
-});
+angular.module('ngMapApp')
+  .controller('MapdetailCtrl', function ($scope, $location, $routeParams) {
+    $scope.mapId = $routeParams.mapId;  
+  });

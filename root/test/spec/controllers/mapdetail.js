@@ -1,17 +1,17 @@
 'use strict';
 
-describe('Controller: MapdetailctrlCtrl', function () {
+describe('Controller: MapdetailCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('ubrGeoApp'));
+  beforeEach(module('ngMapApp'));
 
-  var MapdetailctrlCtrl,
+  var MapdetailCtrl,
     scope;
 
   // Initialize the controller and a mock scope
   beforeEach(inject(function ($controller, $rootScope) {
     scope = $rootScope.$new();
-    MapdetailctrlCtrl = $controller('MapdetailctrlCtrl', {
+    MapdetailCtrl = $controller('MapdetailCtrl', {
       $scope: scope
     });
   }));

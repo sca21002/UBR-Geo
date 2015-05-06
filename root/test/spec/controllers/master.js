@@ -1,17 +1,17 @@
 'use strict';
 
-describe('Controller: ProjectCtrl', function () {
+describe('Controller: MasterCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('ubrGeoApp'));
+  beforeEach(module('ngMapApp'));
 
-  var ProjectCtrl,
+  var MasterCtrl,
     scope;
 
   // Initialize the controller and a mock scope
   beforeEach(inject(function ($controller, $rootScope) {
     scope = $rootScope.$new();
-    ProjectCtrl = $controller('ProjectCtrl', {
+    MasterCtrl = $controller('MasterCtrl', {
       $scope: scope
     });
   }));

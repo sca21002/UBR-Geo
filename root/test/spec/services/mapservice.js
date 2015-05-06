@@ -1,18 +1,18 @@
 'use strict';
 
-describe('Service: mapservice', function () {
+describe('Service: mapService', function () {
 
   // load the service's module
-  beforeEach(module('ubrGeoApp'));
+  beforeEach(module('ngMapApp'));
 
   // instantiate service
-  var mapservice;
-  beforeEach(inject(function (_mapservice_) {
-    mapservice = _mapservice_;
+  var mapService;
+  beforeEach(inject(function (_mapService_) {
+    mapService = _mapService_;
   }));
 
   it('should do something', function () {
-    expect(!!mapservice).toBe(true);
+    expect(!!mapService).toBe(true);
   });
 
 });

@@ -1,4 +1,4 @@
-// Generated on 2015-02-15 using generator-angular 0.11.1
+// Generated on 2015-05-01 using generator-angular 0.11.1
 'use strict';
 
 // # Globbing
@@ -66,7 +66,7 @@ module.exports = function (grunt) {
     // The actual grunt server settings
     connect: {
       options: {
-        port: 8080,
+        port: 9000,
         // Change this to '0.0.0.0' to access the server from outside.
         hostname: '0.0.0.0',
         livereload: 35729

@@ -1,52 +1,22 @@
-.navbar {
-    font-size: 12px;
-    min-height:25px;
-    margin-bottom: 0px;
+/* This line is necessary for Angular UI */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+#maptitle {
+    padding: 5px;
+    border-bottom: 2px solid rgb(231,231,231);
+    margin-bottom: 5px;
 }
 
-.navbar-brand {
-    float: left;
-    font-size: 12px;
-    height: 30px;
-    line-height: 20px;
-    padding: 7px;
-}
-
-
-.navbar-nav > li > a {
-    padding-bottom: 7px;
-    padding-top: 7px;
-}
-
-.navbar-form {
-    margin-bottom: 0px;
-    margin-top: 3px;
-}
-
-.form-control {
-    padding-bottom: 3px;
-    padding-top: 3px;
-    height: 50%;
-}
-
-#mapDetail {
-    border: 2px solid #cc0000;
+#ol-map {
+    height: 600px;    
 }
 
 .thumbnail-map {
     height: 75px;
 }
 
-.map-row {
-    font-size: 75%;
-}
-
-.pagination {
-    border-radius: 4px;
-    display: inline-block;
-    margin: 5px 0;
-    padding-left: 0;
-    font-size: 12px;
+.ol-viewport {
+    border: 1px solid rgb(231,231,231);
 }
 
 .browsehappy {
@@ -113,8 +83,9 @@ body {
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
 /*  .container {
-    max-width: 730px; 
-  } */
+    max-width: 730px;
+  }
+*/
 
   /* Remove the padding we set earlier */
   .header,
@@ -125,7 +96,7 @@ body {
   }
   /* Space out the masthead */
   .header {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   /* Remove the bottom border on the jumbotron for visual effect */
   .jumbotron {

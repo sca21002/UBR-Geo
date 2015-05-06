@@ -7,7 +7,7 @@ use Type::Library
     -base,
     -declare => qw(
             DBICSchema GeoGDALGeoTransform GeoOGRDataSource GeoOGRDriver 
-            GeoGDALGCP GeoOGRLayer
+            GeoGDALGCP GeoOGRLayer UBRGeoGCP
         );
 
 use Type::Utils -all;
@@ -26,8 +26,8 @@ class_type GeoGDALGCP,          {class => 'Geo::GDAL::GCP'         };
 #class_type GeoGDALGeoTransform, {class => 'Geo::GDAL::GeoTransform'};
 class_type DBICSchema,          {class => 'DBIx::Class::Schema'    };
 
+role_type UBRGeoGCP,           {role => 'UBR::Geo::GCP'    };
 
 declare GeoGDALGeoTransform, as ArrayRef[Num];
 
 1;
-

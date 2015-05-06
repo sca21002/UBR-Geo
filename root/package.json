@@ -1,5 +1,5 @@
 {
-  "name": "ubrgeo",
+  "name": "ngmap",
   "version": "0.0.0",
   "dependencies": {},
   "repository": {},
@@ -30,8 +30,5 @@
   },
   "engines": {
     "node": ">=0.10.0"
-  },
-  "scripts": {
-    "test": "grunt test"
   }
 }

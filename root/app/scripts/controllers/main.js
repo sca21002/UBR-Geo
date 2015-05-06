@@ -2,26 +2,16 @@
 
 /**
  * @ngdoc function
- * @name ubrGeoApp.controller:MainCtrl
+ * @name ngMapApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the ubrGeoApp
+ * Controller of the ngMapApp
  */
-angular.module('ubrGeoApp')
+angular.module('ngMapApp')
   .controller('MainCtrl', function ($scope) {
-    $scope.getClass = function (path) {
-      if(path === '/') {
-          if($location.path() === '/') {
-              return "active";
-          } else {
-              return "";
-          }
-      }
-   
-      if ($location.path().substr(0, path.length) === path) {
-          return "active";
-      } else {
-          return "";
-      }
-    }
+    $scope.awesomeThings = [
+      'HTML5 Boilerplate',
+      'AngularJS',
+      'Karma'
+    ];
   });

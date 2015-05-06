@@ -1,9 +1,9 @@
 use utf8;
 package UBR::Geo::Geotransform;
 
-# ABSTRACT: Class for Geotransformation
+# ABSTRACT: Role for Geotransformation
 
-use Moose;
+use Moose::Role;
     
 use MooseX::AttributeShortcuts;
 use Geo::GDAL;
@@ -14,44 +14,37 @@ use Data::Dumper;
 use Modern::Perl;
 
 has 'upperleft_x' => ( 
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Num,
 );    
 
 has 'scale_x' => (
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Num,
 );
 
 has 'skew_y' => ( 
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Num,
 );
 
 has 'upperleft_y' => ( 
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Num,
 );
 
 has 'skew_x' => ( 
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Num,
 );
 
 has 'scale_y' => ( 
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Num,
 );
 
 has 'srid' => (
-    is => 'ro', 
-    required => 1,
+    is => 'rw', 
     isa => Str,
 );   
 
@@ -83,18 +76,18 @@ sub _build_as_href {
     return \%href;
 }
 
-sub new_from_gcps {
-    my ($class, $gcp) = @_;
-     
-    my @params =  qw(upperleft_x scale_x skew_y upperleft_y skew_x scale_y); 
-    my @GDALgeotransform = Geo::GDAL::GCPsToGeoTransform($gcp->gcps);
-    my %geotransform;
-    @geotransform{@params} = @GDALgeotransform;
-    $geotransform{srid} = $gcp->srid;
-    #say Dumper(%geotransform);
-    my $self = $class->new({%geotransform});
-    return $self;    
-}
+#sub new_from_gcps {
+#    my ($class, $gcp) = @_;
+#     
+#    my @params =  qw(upperleft_x scale_x skew_y upperleft_y skew_x scale_y); 
+#    my @GDALgeotransform = Geo::GDAL::GCPsToGeoTransform($gcp->gcps);
+#    my %geotransform;
+#    @geotransform{@params} = @GDALgeotransform;
+#    $geotransform{srid} = $gcp->srid;
+#    #say Dumper(%geotransform);
+#    my $self = $class->new({%geotransform});
+#    return $self;    
+#}
 
 
 sub transform_pixel {
@@ -154,6 +147,6 @@ it under the same terms as Perl itself.
 
 =cut
 
-__PACKAGE__->meta->make_immutable;
-
-
+1; # Magic true value required at end of module
+ 
+__END__

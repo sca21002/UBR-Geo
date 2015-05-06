@@ -3,7 +3,7 @@
 describe('Controller: MapsCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('ubrGeoApp'));
+  beforeEach(module('ngMapApp'));
 
   var MapsCtrl,
     scope;
