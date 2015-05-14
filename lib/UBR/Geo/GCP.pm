@@ -32,15 +32,6 @@ has 'gcps_convex_hull' => (
     isa => ArrayRef[GeoGDALGCP],
 );
 
-#has 'geotransform' => (
-#    is => 'lazy',
-#    isa => GeoGDALGeoTransform,
-#);
-#
-#has 'geotransform_as_href' => (
-#    is => 'lazy',
-#    isa => HashRef[Str],
-#);
 
 has 'segment_length' => (
     is => 'lazy',
@@ -116,21 +107,6 @@ sub _build_gcps_convex_hull {
     return \@gcps;    
 }
 
-#sub _build_geotransform { Geo::GDAL::GCPsToGeoTransform((shift)->gcps) }
-
-#sub _build_geotransform_as_href {
-#    my $self = shift;
-#
-#    my @columns = (qw(
-#        upperleft_x scale_x skew_y upperleft_y skew_x scale_y 
-#    ));
-#    my %geotrans;
-#    @geotrans{@columns} = @{$self->geotransform};
-#    $geotrans{srid} = $self->srid;
-#    # say Dumper( \%geotrans );
-#    return \%geotrans;
-#}
-
 sub _build_segment_length {
     my $self = shift;
 
@@ -147,45 +123,6 @@ sub _build_segment_length {
     my $seg = ($maxX - $minX) / ($maxPx - $minPx) * 400 / 2.54; 
     return $seg;
 }
-
-
-#sub transform_pixel {
-#    my ($self, $pixelX, $pixelY ) = @_;
-#
-#    # warn "TEST:", $pixelX, $pixelY;
-#
-#    return unless defined($pixelX) && defined($pixelY);
-#
-##    my @tr = @{$self->geotransform};
-##
-##    my $x = $tr[0] + $pixelX * $tr[1] + $pixelY * $tr[2];
-##    my $y = $tr[3] + $pixelX * $tr[4] + $pixelY * $tr[5];
-#
-#    my ($x, $y) 
-#        = Geo::GDAL::ApplyGeoTransform($self->geotransform, $pixelX, $pixelY);
-#
-#    return ($x, $y);
-#}
-#
-#sub transform_invers {
-#    my ($self, $x, $y) = @_;
-#
-#    return unless defined($x) && defined($y);
-#
-##    my ($a,$b,$c,$d,$e,$f) = @{$self->geotransform};
-##
-##    my $numerator   = ($x - $a) * $e - $b * $y + $b * $d;
-##    my $denominator = $c * $e - $b * $f;
-##    my $pixel_y = $numerator / $denominator;
-##    my $pixel_x = ($x - $a) / $b - $c / $b * $pixel_y;
-#   
-#    my $inv = Geo::GDAL::InvGeoTransform($self->geotransform);
-#
-#    my ($pixel_x, $pixel_y) 
-#        = Geo::GDAL::ApplyGeoTransform($inv, $x, $y); 
-#
-#    return ($pixel_x, $pixel_y);
-#}    
 
 1;
 

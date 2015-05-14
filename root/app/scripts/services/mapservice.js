@@ -8,9 +8,12 @@
  * Factory in the ngMapApp.
  */
 angular.module('ngMapApp')
-  .factory('mapService', function($http, $q, searchParams) {
+  .factory('mapService', [ '$http', '$q', 'searchParams', 
+          function($http, $q, searchParams) {
 
     var factory = {};
+    var url_base = 'http://pc1011406020.uni-regensburg.de:8888';
+
 
     factory.getList = function () {
 
@@ -22,7 +25,7 @@ angular.module('ngMapApp')
         var project = searchParams.getProject();
         var library = searchParams.getLibrary();
 
-        var url = 'http://pc1011406020.uni-regensburg.de:8888/map/list?bbox=' 
+        var url = url_base + '/map/list?bbox=' 
                   + extent.join(',') + '&page=' + page + '&project=' + project.short
                   + '&isil=' + library.isil;
 
@@ -44,7 +47,7 @@ angular.module('ngMapApp')
         // Creating a deffered object
         var deferred = $q.defer();
 
-        var url = 'http://pc1011406020.uni-regensburg.de:8888/map/' + mapId + '/boundary';
+        var url = url_base + '/map/' + mapId + '/boundary';
 
         $http.get(url).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
@@ -58,14 +61,13 @@ angular.module('ngMapApp')
         return deferred.promise;
     };
 
-    factory.getPid = function(mapId) {
+    factory.getTitle = function(mapId) {
       // Creating a deffered object
       var deferred = $q.defer();
       
-      $http.get(
-        'http://pc1011406020.uni-regensburg.de:8888/map/' +  
-         + mapId + '/detail'    
-        ).success(function(data) {  
+      var url = url_base + '/map/' + mapId + '/detail';
+
+      $http.get(url).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
           deferred.resolve(data);
         }).error(function(){
@@ -77,5 +79,23 @@ angular.module('ngMapApp')
       return deferred.promise;
     }
 
+    factory.getCoord = function(mapId, x, y, srid) {
+      // Creating a deffered object
+      var deferred = $q.defer();
+      
+      var url = url_base + '/map/' + mapId + '/geotransform?x='
+          + x + '&y=' + y + '&srid=' + srid + '&invers=1';
+      $http.get(url).success(function(data) {  
+          //Passing data to deferred's resolve function on successful completion
+          deferred.resolve(data);
+        }).error(function(){
+          //Sending a friendly error message in case of failure
+          deferred.reject("An error occured while fetching coordinates");
+        });
+        
+      //Returning the promise object
+      return deferred.promise;
+    }
+
     return  factory;
-  });
+  }]);

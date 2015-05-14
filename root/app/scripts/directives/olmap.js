@@ -7,9 +7,10 @@
  * # olMap
  */
 angular.module('ngMapApp')
-  .directive('olMap', function (searchParams, mapboxURL) {
+  .directive('olMap', ['searchParams', 'mapboxURL', 
+    function (searchParams, mapboxURL) {
     return {
-      template: '<div></div>',
+      template: '',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         var view = new ol.View({
@@ -37,7 +38,9 @@ angular.module('ngMapApp')
               new ol.control.OverviewMap({
                   collapsed: false
               }),
-              new ol.control.Attribution(),              
+              new ol.control.Attribution({
+                  collapsible: false,
+              }),
           ],
           view: view
         });
@@ -82,4 +85,4 @@ angular.module('ngMapApp')
         getMaps();
       }   
     };
-  });
+  }]);

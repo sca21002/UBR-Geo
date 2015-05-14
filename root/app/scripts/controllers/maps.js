@@ -8,7 +8,8 @@
  * Controller of the ngMapApp
  */
 angular.module('ngMapApp')
-  .controller('MapsCtrl', 
+  .controller('MapsCtrl', ['$scope', '$routeParams', '$location',
+        'mapService', 'searchParams', 'thumbnailURL',                    
     function (
         $scope, $routeParams, $location, mapService, 
         searchParams, thumbnailURL ) {
@@ -55,31 +56,24 @@ angular.module('ngMapApp')
     }
     
     $scope.open = function(map) {
-        var map_id = map.map_id;
-//        var olMap = $scope.olMap;
-//        var view = olMap.getView();
-//        var center = view.getCenter();
-//        var x = center[0];
-//        var y = center[1];
-//        $http.get('http://pc1011406020.uni-regensburg.de:8888/map/' 
-//                + map_id + '/geotransform' + '?x=' + x + '&y=' + y 
-//                + '&invers=1&srid=3857'
-//        ).success(function(data) {
-//            $scope.pixel_x = data.pixel[0];
-//            $scope.pixel_y = data.pixel[1];
-//            var pid = map.pid;
-//            $scope.pid = pid;
-//            if (pid) {
-//                var url = 'http://bvbm1.bib-bvb.de/webclient/DeliveryManager'
-//                    + '?custom_att_2=simple_viewer&pid='
-//                    + pid 
-//                    + '&x=' + $scope.pixel_x + '&y=' + $scope.pixel_y +  '&res=2';
-                $scope.$emit('ChangedMapId', map_id);     
-                $location.path('/map/'+ map_id);
-//            } else {
-//               alert('Karte nicht online');
-//            }
-//        });
+        var mapId = map.map_id;
+        $scope.$emit('ChangedMap', mapId); 
+        console.log('Search: ', $location.search());
+        var searchObj = $location.search();
+        if (searchObj.x && searchObj.y) {
+          mapService.getCoord(mapId,searchObj.x,searchObj.y,31468).then(
+            function(data){
+              console.log(data);
+              var pixel = data.pixel;
+              $location.path('/map/'+ mapId); 
+              $location.search({ x: pixel[0], y: pixel[1] });
+              console.log($location.absUrl());
+            }
+          );
+            
+        } else {
+            $location.path('/map/'+ mapId);
+        }
     }
 
     $scope.$on('ChangedProject', function (event, project) {
@@ -90,4 +84,4 @@ angular.module('ngMapApp')
         $scope.getMaps();
     });
 
-  });
+  }]);

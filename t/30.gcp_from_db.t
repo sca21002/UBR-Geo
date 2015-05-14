@@ -9,7 +9,7 @@ use Data::Dumper;
 
 BEGIN {
     use_ok('UBR::Geo::GCP::FromDB') or exit;
-    use_ok('UBR::Geo::Geotransform') or exit;
+    use_ok('UBR::Geo::Geotransform::FromGCP') or exit;
 }
 
 
@@ -62,7 +62,7 @@ my $gcps = $gcp->gcps_as_href;
 
 is_deeply($gcps, $gcps_expected, 'GCPs read');
 
-my $geotransform = UBR::Geo::Geotransform->new_from_gcps($gcp);
+my $geotransform = UBR::Geo::Geotransform::FromGCP->new({gcp => $gcp});
 
 is(sprintf("%.2f %.2f", $geotransform->transform_pixel(695 ,550, 4805 )), '43.50 45.75', 'Point 1');
 is(sprintf("%.2f %.2f", $geotransform->transform_pixel(8920,6485, 4805 )), '44.00 45.50', 'Point 2');   

@@ -18,7 +18,7 @@ angular
     'ngTouch',
     'ui.bootstrap'
     ])
-  .config(function ($routeProvider) {
+  .config(['$routeProvider', function ($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
@@ -39,7 +39,4 @@ angular
       .otherwise({
         redirectTo: '/'
       });
-  })
-  .run(function($rootScope){
-    $rootScope.mapId = 1;
-  });
+  }]);

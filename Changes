@@ -1,8 +1,14 @@
 This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
+ 
+    - Add spinner in map detail view
+    - Add deep linking into map regions
+    - Add filter for libraries
 
 0.006     2015-05-03 13:43:49+02:00 Europe/Berlin
+
+    - Add filter for projects
 
 0.005     2015-04-26 12:42:20+02:00 Europe/Berlin
 

@@ -8,9 +8,10 @@
  * Controller of the ngMapApp
  */
 angular.module('ngMapApp')
-  .controller('MasterCtrl', function ($scope, projectService, libraryService, searchParams) {
-    $scope.mapId = 1;
-    $scope.$on('ChangedMapId', function (event, mapId) {
+  .controller('MasterCtrl', [ '$scope', 'projectService', 'libraryService', 'searchParams', 
+          function ($scope, projectService, libraryService, searchParams) {
+    $scope.map = { mapId: 1 };              
+    $scope.$on('ChangedMap', function (event, mapId) {
           $scope.mapId = mapId;
     });
 
@@ -29,4 +30,4 @@ angular.module('ngMapApp')
         searchParams.setLibrary($scope.library);
         $scope.$broadcast('ChangedLibrary',$scope.library)
     }
-  });
+  }]);

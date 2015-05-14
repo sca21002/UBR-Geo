@@ -8,7 +8,8 @@
  * Factory in the ngMapApp.
  */
 angular.module('ngMapApp')
-  .factory('searchParams', function (projectService, libraryService) {
+  .factory('searchParams', ['projectService', 'libraryService', 
+          function (projectService, libraryService) {
 
     var data = {
         extent:  [8.98,47.27,13.83,50.56],
@@ -52,4 +53,4 @@ angular.module('ngMapApp')
     }
     
     return factory; 
-  });
+  }]);

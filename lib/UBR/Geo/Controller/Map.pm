@@ -6,7 +6,7 @@ package UBR::Geo::Controller::Map;
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
-use UBR::Geo::Geotransform;
+use UBR::Geo::Geotransform::Simple;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -148,7 +148,7 @@ sub geotransform : Chained('map') PathPart('geotransform') Args(0) {
 
     my $map = $c->stash->{map};
     my $geotransform_row = $map->geotransform;    
-    my $geotransform = UBR::Geo::Geotransform->new(
+    my $geotransform = UBR::Geo::Geotransform::Simple->new(
         $geotransform_row->get_columns()
     );
 

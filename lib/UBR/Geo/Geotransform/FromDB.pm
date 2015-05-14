@@ -1,38 +1,41 @@
 use utf8;
 package UBR::Geo::Geotransform::FromDB;
 
-# ABSTRACT: Class for Geotransformation with GCPs from DB
+# ABSTRACT: Class for Geotransformation with data from DB
 
 use Moose;
     with 'UBR::Geo::Geotransform';   
 
 use MooseX::AttributeShortcuts;
-use Geo::GDAL;
-use UBR::Geo::Types qw(UBRGeoGCP);
-use Data::Dumper;
 use Modern::Perl;
+use UBR::Geo::Types qw(DBICSchema Int);
+use UBR::Geo::Helper;
+use Data::Dumper;
 
-has 'gcp' => (
-    is => 'ro',
-    required => 1,
-    isa => UBRGeoGCP,
+
+has 'schema' => (
+    is  => 'lazy',
+    isa => DBICSchema,
 );
 
+has 'map_id' => (
+    is => 'ro',
+    required => 1,
+    isa => Int,
+);
 
 sub BUILD {
     my $self = shift;
-
-    my @params =  qw(upperleft_x scale_x skew_y upperleft_y skew_x scale_y); 
-    warn ref $self->gcp;
-    my @GDALgeotransform = Geo::GDAL::GCPsToGeoTransform($self->gcp->gcps);
-    my %geotransform;
-    @geotransform{@params} = @GDALgeotransform;
-    warn Dumper(\%geotransform);
-    $geotransform{srid} = $self->gcp->srid;
-    foreach my $key (keys %geotransform) {
+    
+    my @params =  qw(upperleft_x scale_x skew_y upperleft_y skew_x scale_y srid); 
+    my $row = $self->schema->resultset('Geotransform')->find($self->map_id);
+    my %geotransform = $row->get_columns();
+    foreach my $key (@params) {
         $self->$key( $geotransform{$key} );
     };
 }
+
+sub _build_schema { UBR::Geo::Helper::get_schema() }
 
 __PACKAGE__->meta->make_immutable;
 

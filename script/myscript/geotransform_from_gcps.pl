@@ -14,6 +14,7 @@ use Log::Log4perl qw(:easy);
 use Getopt::Long;
 use UBR::Geo::Helper;
 use UBR::Geo::GCP::FromDB;
+use UBR::Geo::Geotransform::FromGCP;
 
 my $logfile = path($Bin)->parent(2)->child(
     'geotransform_from_gcps.log'
@@ -45,11 +46,11 @@ my $schema = UBR::Geo::Helper::get_schema();
 
 my $gcp_group_rs = $schema->resultset('GCP')->search(
     {
-        'geotransforms.map_id' => undef,    
+#        'geotransforms.map_id' => undef,    
     },
     {
         columns => [ qw(map.map_id map.filename) ],
-        join => { map => 'geotransforms' },
+        join => { map => 'geotransform' },
         group_by => [ qw(map.map_id) ],
     }
 );
@@ -63,7 +64,7 @@ while (my $gcp_group = $gcp_group_rs->next) {
     my $gcp = UBR::Geo::GCP::FromDB ->new(
 	    filename => $filename,
     );
-    my $geotransform = UBR::Geo::Geotransform->new_from_gcps($gcp);
+    my $geotransform = UBR::Geo::Geotransform::FromGCP->new({gcp => $gcp});
     say Dumper( { %{$geotransform->as_href}, map_id => $map_id } );
     $geotransform_rs->create({ 
         %{$geotransform->as_href},

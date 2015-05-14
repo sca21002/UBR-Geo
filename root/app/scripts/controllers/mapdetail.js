@@ -1,13 +1,13 @@
 'use strict';
 
 /**
- * @ngdoc function
+ * @ngdoc function$routeParams
  * @name ngMapApp.controller:MapdetailCtrl
  * @description
  * # MapdetailCtrl
  * Controller of the ngMapApp
  */
 angular.module('ngMapApp')
-  .controller('MapdetailCtrl', function ($scope, $location, $routeParams) {
+  .controller('MapdetailCtrl', ['$scope', '$location', '$routeParams', function ($scope, $location, $routeParams) {
     $scope.mapId = $routeParams.mapId;  
-  });
+  }]);

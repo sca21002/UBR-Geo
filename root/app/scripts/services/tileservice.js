@@ -8,7 +8,7 @@
  * Factory in the ngMapApp.
  */
 angular.module('ngMapApp')
-  .factory('tileService', function ($http,$q) {
+  .factory('tileService', ['$http', '$q', function ($http,$q) {
   
     var factory = {};
     
@@ -20,12 +20,14 @@ angular.module('ngMapApp')
       $http.get(
         'http://digipool.bib-bvb.de/bvb/anwender/CORS/get_imageinfo.pl?pid='
             + pid
-        ).success(function(data) {  
+        ).success(function(data) { 
+          // console.log("Get image info");  
           //Passing data to deferred's resolve function on successful completion
           deferred.resolve(data);
         }).error(function(){
+          console.log("An error detected");
           //Sending a friendly error message in case of failure
-          deferred.reject("An error occured while fetching items");
+          deferred.reject("Keine Infos zur Karte mit der PID '"+ pid + "'");
         });
         
       //Returning the promise object
@@ -34,4 +36,4 @@ angular.module('ngMapApp')
 
     return factory;
 
-  });
+  }]);
