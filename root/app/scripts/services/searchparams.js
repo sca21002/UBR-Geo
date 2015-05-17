@@ -12,10 +12,11 @@ angular.module('ngMapApp')
           function (projectService, libraryService) {
 
     var data = {
+        center:  [],
         extent:  [8.98,47.27,13.83,50.56],
         page: 1,
         project: projectService.default(),
-        library: libraryService.default()
+        library: libraryService.default(),
     };
     
     var factory = {};
@@ -28,6 +29,14 @@ angular.module('ngMapApp')
         data.extent = extent;
     };
 
+    factory.getCenter = function() {
+        return data.center;
+    };
+
+    factory.setCenter = function(extent) {
+        data.center = extent;
+    };
+
     factory.getPage = function() {
         return data.page;
     };
@@ -38,19 +47,19 @@ angular.module('ngMapApp')
 
     factory.getProject = function() {
         return data.project; 
-    }    
+    };    
 
     factory.setProject = function(project) {
         data.project = project;
-    }    
+    };    
 
     factory.getLibrary = function() {
         return data.library; 
-    }    
+    };    
 
     factory.setLibrary = function(library) {
         data.library = library;
-    }
+    };
     
     return factory; 
   }]);

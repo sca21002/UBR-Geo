@@ -6,6 +6,9 @@
  * @description
  * # olMapDetail
  */
+
+/*global ol, Spinner, alert*/
+
 angular.module('ngMapApp')
   .directive('olMapDetail', [ '$routeParams', 'mapService', 'tileService', 
           'libraryService',
@@ -13,7 +16,7 @@ angular.module('ngMapApp')
     return {
       template: '<div></div>',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {
+      link: function postLink(scope, element) {
         var opts = {
           lines: 13, // The number of lines to draw
           length: 20, // The length of each line
@@ -37,28 +40,24 @@ angular.module('ngMapApp')
         mapService.getTitle(scope.mapId).then(function(data){ 
           var pid = data.detail.pid;
           var library = libraryService.getLibrary(data.detail.isil);
-          scope.isbd = data.detail.mab331;
+          scope.isbd = data.detail.isbd;
           tileService.getInfo(pid).then(function(data){
             var imgHeight = data.imgHeight;
             var imgWidth  = data.imgWidth;
             var maxZoom   = data.maxZoom;
             var filename = data.filename;
-            var img_projection = new ol.proj.Projection({
-              code: 'pixel',
-              units: 'm',
-            });
+            var url = 'http://digital.bib-bvb.de/ImageServer/mytile.jsp?filename=';
+            url = url + filename + '&zoom={z}&x={x}&y={y}&rotation=0';
             var source = new ol.source.XYZ({
-              url : 'http://digital.bib-bvb.de/ImageServer/mytile.jsp?filename='
-                + filename                    
-                + '&zoom={z}&x={x}&y={y}&rotation=0',
+              url : url,
               wrapX: false,
               crossOrigin: null,
               attributions: [
                   new ol.Attribution({
-                      html: "Kacheln: <a href='http://www.bib-bvb.de/'>Bibliotheksverbund Bayern,</a>"
+                      html: 'Kacheln: <a href="http://www.bib-bvb.de/">Bibliotheksverbund Bayern,</a>'
                   }),
                   new ol.Attribution({
-                      html: "Karte: <a href='"+ library.url + "'>" + library.name + "</a>"
+                      html: 'Karte: <a href="'+ library.url + '">' + library.name + '</a>'
                   }),
               ],
             });
@@ -80,7 +79,7 @@ angular.module('ngMapApp')
                 zoom: maxZoom
               })
             });
-            source.on('tileloadend', function(event) {
+            source.on('tileloadend', function() {
               spinner.stop();  
             });
             // console.log('RouteParams: ', $routeParams);
@@ -106,16 +105,56 @@ angular.module('ngMapApp')
                 // console.log('Map: ', xMap, yMap);
                 view.setCenter([xMap, yMap]);
                 view.setZoom(maxZoom - 1);
-
+            } else if (
+                    $routeParams.x1 && $routeParams.y1 && $routeParams.x2 && $routeParams.y2
+                         && ( parseFloat($routeParams.x2) < imgWidth 
+                              || parseFloat($routeParams.y1) < imgHeight
+                        )
+                    ) {
+                var x1Pixel = $routeParams.x1;
+                var y1Pixel = $routeParams.y1;
+                var x2Pixel = $routeParams.x2;
+                var y2Pixel = $routeParams.y2;
+                console.log('Extent: Pixel: ', [x1Pixel,y1Pixel,x2Pixel,y2Pixel]);
+                console.log('Map: Pixel: ', imgWidth, imgHeight);
+                // console.log('Extent: ', extent);
+                // console.log('tileSizeTot ', $tileSizeTot);
+                var x1Map = extent[0] + (extent[2] - extent[0]) * x1Pixel / $tileSizeTot;
+                var y1Map = extent[3] - (extent[3] - extent[1]) * y1Pixel / $tileSizeTot;
+                var x2Map = extent[0] + (extent[2] - extent[0]) * x2Pixel / $tileSizeTot;
+                var y2Map = extent[3] - (extent[3] - extent[1]) * y2Pixel / $tileSizeTot;
+                console.log('Extent: Map: ', [x1Map,y1Map,x2Map,y2Map]);
+                view.fitExtent([x1Map,y1Map,x2Map,y2Map], mapSize);
+                console.log('Zoom: ', view.getZoom());
+              
             } else {
             
               var $mapWidth  = (extent[2] - extent[0]) * imgWidth  / $tileSizeTot;
               var $mapHeight = (extent[3] - extent[1]) * imgHeight / $tileSizeTot;
     
-              // map center 
-              var xCenter = extent[0] + $mapWidth  / 2;
-              var yCenter = extent[3] - $mapHeight / 2;
-    
+              // map center
+              
+
+              var xCenter, yCenter;
+//              if ($routeParams.x1 && $routeParams.y1 && $routeParams.x2 && $routeParams.y2) {
+//                var x1Pixel = $routeParams.x1;
+//                var y1Pixel = $routeParams.y1;
+//                var x2Pixel = $routeParams.x2;
+//                var y2Pixel = $routeParams.y2;
+//                console.log('Extent: Pixel: ', [x1Pixel,y1Pixel,x2Pixel,y2Pixel]);
+//                console.log('Map: Pixel: ', imgWidth, imgHeight);
+//                xCenter = parseFloat(x1Pixel) + (parseFloat(x2Pixel) - parseFloat(x1Pixel))/2;                 
+//                yCenter = parseFloat(y1Pixel) - (parseFloat(y1Pixel) - parseFloat(y2Pixel))/2;
+//                console.log('Center: ', xCenter, yCenter);    
+//                
+//                xCenter = extent[0] + (extent[2] - extent[0]) * xCenter / $tileSizeTot;
+//                yCenter = extent[3] - (extent[3] - extent[1]) * yCenter / $tileSizeTot;
+//                console.log('Center: ', xCenter, yCenter);    
+//              } else {
+                xCenter = extent[0] + $mapWidth  / 2;
+                yCenter = extent[3] - $mapHeight / 2;
+//              }    
+     
               // calculate extent of the map  
               extent[2] = extent[0] + $mapWidth;
               extent[1] = extent[3] - $mapHeight;
@@ -130,8 +169,8 @@ angular.module('ngMapApp')
 //              $('#mouse4326').text(ol.coordinate.toStringXY(coord4326, 4));
 //            });
           }, function(error){
-            console.log("ERRROR: ", error);
-            alert("Fehler: " + error);
+            console.log('ERRROR: ', error);
+            alert('Fehler: ' + error);
           });
         });
       }

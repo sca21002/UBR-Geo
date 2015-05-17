@@ -48,9 +48,9 @@ sub _build_gcps {
    
     my @lines  = split "\n", $data;
     my @header = split ',', shift @lines;
-    
+    my $header_str = join('|', @{$self->header});   
     die('Unexpected header ' . join('|', @header . " <> " . join('|', @{$self->header})) ) 
-	unless join('|', @header) eq join('|', @{$self->header});
+	unless join('|',@header) =~ /^$header_str/;
     
     my (%row, @coords);
     foreach my $line ( @lines ) {

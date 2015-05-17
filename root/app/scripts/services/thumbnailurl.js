@@ -10,7 +10,8 @@
 angular.module('ngMapApp')
   .factory('thumbnailURL', function () {
     return function (pid) {
-        return 'http://digital.bib-bvb.de/webclient/DeliveryManager?pid='
-        + pid + '&custom_att_2=thumbnailstream';
+        var url = 'http://digital.bib-bvb.de/webclient/DeliveryManager?pid=';
+        url = url + pid + '&custom_att_2=thumbnailstream';
+        return url;
     };
   });

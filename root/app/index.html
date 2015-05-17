@@ -46,11 +46,16 @@
             <form class="navbar-form navbar-left" role="search">
               <div class="form-group">
                <label for="selectproject">Projekt:</label>
-               <select id="selectproject" class="form-control" ng-model="project" ng-options="project.name for project in projects" ng-change="projectChanged()">
+               <select id="selectproject" class="form-control" 
+                   ng-model="project" 
+                   ng-options="project.short as project.name for project in projects" ng-change="projectChanged()">
+                   <option value="">alle Karten</option>
               </select>
               <div class="form-group">
                <label for="selectlibrary">Bestand:</label>
-               <select id="selectlibrary" class="form-control" ng-model="library" ng-options="library.name for library in libraries" ng-change="libraryChanged()">
+               <select id="selectlibrary" class="form-control" ng-model="library" 
+                   ng-options="library.isil as library.name for library in libraries" ng-change="libraryChanged()">
+                   <option value="">alle Bibl.</option>
               </select>
               </div>    
             </form>
@@ -81,6 +86,7 @@
     <script src="bower_components/angular-touch/angular-touch.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="bower_components/spin-js/spin.js"></script>
+    <script src="bower_components/proj4/dist/proj4.js"></script>
     <!-- endbower -->
     <script src="bower_components/openlayers/ol-debug.js"></script>     
     <!-- endbuild -->

@@ -122,6 +122,7 @@ sub detail : Chained('map') PathPart('detail') Args(0) {
 
     my $map = $c->stash->{map};
     my $href = { $map->get_columns() };
+    $href->{isbd} = $map->title_isbd;
 
     my $response = { detail => $href };
     $c->stash(
@@ -159,6 +160,47 @@ sub geotransform : Chained('map') PathPart('geotransform') Args(0) {
     $y_px = sprintf("%.0f",$y_px);
 
     my $response = { pixel => [$x_px, $y_px]  };
+    $c->stash(
+        %$response,
+        current_view => 'JSON'
+    );
+}
+
+# TODO: is a test for 4 coords, should be unified with geotransform
+sub geotransform2 : Chained('map') PathPart('geotransform2') Args(0) {
+    my ($self, $c) = @_;
+
+    my $x1_geo = $c->req->params->{x1};
+    my $y1_geo = $c->req->params->{y1};
+    my $x2_geo = $c->req->params->{x2};
+    my $y2_geo = $c->req->params->{y2};
+    my $invers = $c->req->params->{invers};
+    my $srid   = $c->req->params->{srid} || 3857; 
+
+    unless (
+        defined $x1_geo && defined $y1_geo && defined $x2_geo && defined $y2_geo
+        && $invers 
+    ) {
+	    $c->detach('not_found');
+    }
+
+    my $map = $c->stash->{map};
+    my $geotransform_row = $map->geotransform;    
+    my $geotransform = UBR::Geo::Geotransform::Simple->new(
+        $geotransform_row->get_columns()
+    );
+
+    $c->log->debug("Transform: $x1_geo, $y1_geo, $x2_geo, $y2_geo, $srid");
+    my ($x1_px, $y1_px) 
+        = $geotransform->transform_invers($x1_geo, $y1_geo, $srid);
+    $x1_px = sprintf("%.0f",$x1_px);
+    $y1_px = sprintf("%.0f",$y1_px);
+    my ($x2_px, $y2_px) 
+        = $geotransform->transform_invers($x2_geo, $y2_geo, $srid);
+    $x2_px = sprintf("%.0f",$x2_px);
+    $y2_px = sprintf("%.0f",$y2_px);
+
+    my $response = { pixel => [$x1_px, $y1_px, $x2_px, $y2_px]  };
     $c->stash(
         %$response,
         current_view => 'JSON'

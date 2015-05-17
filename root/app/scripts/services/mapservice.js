@@ -12,7 +12,7 @@ angular.module('ngMapApp')
           function($http, $q, searchParams) {
 
     var factory = {};
-    var url_base = 'http://pc1011406020.uni-regensburg.de:8888';
+    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
 
 
     factory.getList = function () {
@@ -25,9 +25,10 @@ angular.module('ngMapApp')
         var project = searchParams.getProject();
         var library = searchParams.getLibrary();
 
-        var url = url_base + '/map/list?bbox=' 
-                  + extent.join(',') + '&page=' + page + '&project=' + project.short
-                  + '&isil=' + library.isil;
+        var url = urlBase + '/map/list?bbox=' + extent.join(',');
+        if (page) { url = url + '&page=' + page; }
+        if (project) { url = url + '&project=' + project; }
+        if (library.isil) { url = url + '&isil=' + library.isil; }
 
 
         $http.get(url).success(function(data) {  
@@ -47,7 +48,7 @@ angular.module('ngMapApp')
         // Creating a deffered object
         var deferred = $q.defer();
 
-        var url = url_base + '/map/' + mapId + '/boundary';
+        var url = urlBase + '/map/' + mapId + '/boundary';
 
         $http.get(url).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
@@ -65,37 +66,57 @@ angular.module('ngMapApp')
       // Creating a deffered object
       var deferred = $q.defer();
       
-      var url = url_base + '/map/' + mapId + '/detail';
+      var url = urlBase + '/map/' + mapId + '/detail';
 
       $http.get(url).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
           deferred.resolve(data);
         }).error(function(){
           //Sending a friendly error message in case of failure
-          deferred.reject("An error occured while fetching the pid");
+          deferred.reject('An error occured while fetching the pid');
         });
         
       //Returning the promise object
       return deferred.promise;
-    }
+    };
 
     factory.getCoord = function(mapId, x, y, srid) {
       // Creating a deffered object
       var deferred = $q.defer();
       
-      var url = url_base + '/map/' + mapId + '/geotransform?x='
-          + x + '&y=' + y + '&srid=' + srid + '&invers=1';
+      var url = urlBase + '/map/' + mapId + '/geotransform?x=';
+      url = url + x + '&y=' + y + '&srid=' + srid + '&invers=1';
       $http.get(url).success(function(data) {  
           //Passing data to deferred's resolve function on successful completion
           deferred.resolve(data);
         }).error(function(){
           //Sending a friendly error message in case of failure
-          deferred.reject("An error occured while fetching coordinates");
+          deferred.reject('An error occured while fetching coordinates');
         });
         
       //Returning the promise object
       return deferred.promise;
-    }
+    };
+
+    factory.getCoords = function(mapId, x1, y1, x2, y2, srid) {
+      // Creating a deffered object
+      var deferred = $q.defer();
+      
+      var url = urlBase + '/map/' + mapId + '/geotransform2';
+      url = url + '?x1=' + x1 + '&y1=' + y1;
+      url = url + '&x2=' + x2 + '&y2=' + y2;
+      url = url + '&srid=' + srid + '&invers=1';
+      $http.get(url).success(function(data) {  
+          //Passing data to deferred's resolve function on successful completion
+          deferred.resolve(data);
+        }).error(function(){
+          //Sending a friendly error message in case of failure
+          deferred.reject('An error occured while fetching coordinates');
+        });
+        
+      //Returning the promise object
+      return deferred.promise;
+    };
 
     return  factory;
   }]);

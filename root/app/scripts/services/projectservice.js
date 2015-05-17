@@ -11,9 +11,8 @@ angular.module('ngMapApp')
   .factory('projectService', function () {
 
     var projects = [
-      { short: "",           name: "alle Karten" },
-      { short: "BLO",        name: "BLO" },
-      { short: "GeoPortOst", name: "GeoPortOst" },
+      { short: 'BLO',        name: 'BLO' },
+      { short: 'GeoPortOst', name: 'GeoPortOst' },
     ];
               
     var factory = {};
@@ -23,7 +22,7 @@ angular.module('ngMapApp')
     };
 
     factory.default = function () {
-      return projects[0];    
+      return '';    
     };    
 
     return factory;
