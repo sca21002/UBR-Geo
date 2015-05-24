@@ -45,36 +45,37 @@ angular.module('ngMapApp')
                   collapsible: false,
               }),
           ],
-          view: view
+          view: view,
+          maxZoom: 0,
         });
 
         var center = searchParams.getCenter();
-        console.log('Center: ', center);
+        // console.log('Center: ', center);
 
         if (center.length>0) {
             view.setCenter(center);
             view.setZoom(10);
         } else {
             var extent4326 = searchParams.getExtent();
-            console.log('Extent(4326): ', extent4326);
+            // console.log('Extent(4326): ', extent4326);
             var setExtent3857 = ol.proj.transformExtent(extent4326, 'EPSG:4326', 'EPSG:3857');
-            console.log('setExtent3857 1: ',setExtent3857);
+            // console.log('setExtent3857 1: ',setExtent3857);
             var widthDelta  = (setExtent3857[2] - setExtent3857[0]) * 0.05; 
             var heightDelta = (setExtent3857[3] - setExtent3857[1]) * 0.05;
-            console.log('widthDelta: ', widthDelta);
-            console.log('heightDelta: ', heightDelta);
+            // console.log('widthDelta: ', widthDelta);
+            // console.log('heightDelta: ', heightDelta);
             setExtent3857[0] = setExtent3857[0] + widthDelta;
             setExtent3857[1] = setExtent3857[1] + heightDelta;
             setExtent3857[2] = setExtent3857[2] - widthDelta;
             setExtent3857[3] = setExtent3857[3] - heightDelta;
-            console.log('setExtent3857 2: ',setExtent3857);
+            // console.log('setExtent3857 2: ',setExtent3857);
 
             var size = map.getSize();
             view.fitExtent(setExtent3857, size);
             var actualExtent3857 = view.calculateExtent( map.getSize() );
             var actualExtent4326 = ol.proj.transformExtent(actualExtent3857, 'EPSG:3857', 'EPSG:4326');
-            console.log('setExtent3857 act ', actualExtent3857);
-            console.log('Extent(4326 act): ', actualExtent4326);
+            // console.log('setExtent3857 act ', actualExtent3857);
+            // console.log('Extent(4326 act): ', actualExtent4326);
             searchParams.setExtent(actualExtent4326);
         }
            
@@ -82,7 +83,7 @@ angular.module('ngMapApp')
             var actualExtent3857 = view.calculateExtent( map.getSize() );
             var actualExtent4326 = ol.proj.transformExtent(actualExtent3857, 'EPSG:3857', 'EPSG:4326');
             searchParams.setExtent(actualExtent4326);
-            console.log('Adjust extent: ', actualExtent4326);
+            // console.log('Adjust extent: ', actualExtent4326);
             var boundingbox = [];
             angular.forEach(actualExtent4326, function(coord) {
                 this.push(Number(coord.toFixed(1)));

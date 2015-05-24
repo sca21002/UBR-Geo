@@ -1,10 +1,23 @@
 /* This line is necessary for Angular UI */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
+.navbar {
+    margin-bottom: 0px;
+}
+
 #maptitle {
     padding: 5px;
     border-bottom: 2px solid rgb(231,231,231);
     margin-bottom: 5px;
+}
+
+#mapdetail-title {
+    padding-left: 5px;
+}
+
+#exemplar {
+    padding-left: 5px;
+    padding-bottom: 5px;
 }
 
 #ol-map {

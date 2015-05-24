@@ -7,6 +7,8 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 use UBR::Geo::Geotransform::Simple;
+use JSON;
+use Try::Tiny;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -108,6 +110,8 @@ sub boundary : Chained('map_with_geojson') PathPart('boundary') Args(0) {
     );
 }
 
+
+
 sub map : Chained('maps') PathPart('') CaptureArgs(1) {
     my ($self, $c, $map_id) = @_;
 
@@ -123,6 +127,7 @@ sub detail : Chained('map') PathPart('detail') Args(0) {
     my $map = $c->stash->{map};
     my $href = { $map->get_columns() };
     $href->{isbd} = $map->title_isbd;
+    $href->{exemplar} = $map->exemplar;
 
     my $response = { detail => $href };
     $c->stash(
@@ -191,16 +196,58 @@ sub geotransform2 : Chained('map') PathPart('geotransform2') Args(0) {
     );
 
     $c->log->debug("Transform: $x1_geo, $y1_geo, $x2_geo, $y2_geo, $srid");
-    my ($x1_px, $y1_px) 
+    my ($x1_px, $y1_px);
+    try {
+        ($x1_px, $y1_px)
         = $geotransform->transform_invers($x1_geo, $y1_geo, $srid);
+    } catch {
+        $c->log->debug("Transform failed: $_");
+	    $c->detach('not_found');
+    };
     $x1_px = sprintf("%.0f",$x1_px);
     $y1_px = sprintf("%.0f",$y1_px);
-    my ($x2_px, $y2_px) 
-        = $geotransform->transform_invers($x2_geo, $y2_geo, $srid);
+    my ($x2_px, $y2_px);
+    try {
+        ($x2_px, $y2_px) 
+            = $geotransform->transform_invers($x2_geo, $y2_geo, $srid);
+    } catch {
+        $c->log->debug("Transform failed: $_");
+	    $c->detach('not_found');
+    };
     $x2_px = sprintf("%.0f",$x2_px);
     $y2_px = sprintf("%.0f",$y2_px);
 
     my $response = { pixel => [$x1_px, $y1_px, $x2_px, $y2_px]  };
+    $c->stash(
+        %$response,
+        current_view => 'JSON'
+    );
+}
+
+sub map_with_contains : Chained('maps') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $map_id) = @_;
+
+    $c->stash->{map_id} = $map_id;
+}
+
+sub contains_point : Chained('map_with_contains') PathPart('contains') Args(0) {
+    my ($self, $c) = @_;
+
+    my $map_id = $c->stash->{map_id};
+    my $rs = $c->stash->{map_rs}; 
+
+    my $lon = $c->req->params->{x};
+    my $lat = $c->req->params->{y};
+
+    unless ( defined $lon && defined $lat && $map_id ) {
+	    $c->detach('not_found');
+    }
+
+    my $row = $rs->contains_point($map_id, $lon, $lat);
+
+    my $contains = $row->get_column('contains');
+    $c->log->debug('Contains: ', $contains);
+    my $response = { contains => $contains ? JSON::true : JSON::false };
     $c->stash(
         %$response,
         current_view => 'JSON'

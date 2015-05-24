@@ -83,3 +83,24 @@ sub find_with_geojson {
         },
     )->first;
 }
+
+sub contains_point {
+    my ($self, $map_id, $lon, $lat) = @_; 
+
+    my $contains = sprintf(
+        "ST_CONTAINS(boundary.boundary_wld,ST_SetSRID(ST_Point(%f,%f),3857))",
+        $lon, $lat
+    );
+
+    return $self->search(
+        {
+            map_id => $map_id,
+        },
+        {
+            join      => [ 'boundary' ],
+            'select' => \$contains,
+            'as'     => 'contains',
+            
+        }
+    )->first;
+}

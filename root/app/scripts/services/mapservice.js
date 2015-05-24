@@ -28,7 +28,7 @@ angular.module('ngMapApp')
         var url = urlBase + '/map/list?bbox=' + extent.join(',');
         if (page) { url = url + '&page=' + page; }
         if (project) { url = url + '&project=' + project; }
-        if (library.isil) { url = url + '&isil=' + library.isil; }
+        if (library) { url = url + '&isil=' + library; }
 
 
         $http.get(url).success(function(data) {  
@@ -111,7 +111,26 @@ angular.module('ngMapApp')
           deferred.resolve(data);
         }).error(function(){
           //Sending a friendly error message in case of failure
+          console.log("Error: fetching coordinates");
           deferred.reject('An error occured while fetching coordinates');
+        });
+        
+      //Returning the promise object
+      return deferred.promise;
+    };
+
+    factory.contains = function(mapId, x, y) {
+      // Creating a deffered object
+      var deferred = $q.defer();
+      
+      var url = urlBase + '/map/' + mapId + '/contains';
+      url = url + '?x=' + x + '&y=' + y;
+      $http.get(url).success(function(data) {  
+          //Passing data to deferred's resolve function on successful completion
+          deferred.resolve(data);
+        }).error(function(){
+          //Sending a friendly error message in case of failure
+          deferred.reject('An error occured while processing contains');
         });
         
       //Returning the promise object

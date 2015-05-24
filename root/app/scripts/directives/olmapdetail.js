@@ -41,6 +41,7 @@ angular.module('ngMapApp')
           var pid = data.detail.pid;
           var library = libraryService.getLibrary(data.detail.isil);
           scope.isbd = data.detail.isbd;
+          scope.exemplar = data.detail.exemplar;
           tileService.getInfo(pid).then(function(data){
             var imgHeight = data.imgHeight;
             var imgWidth  = data.imgWidth;
@@ -76,7 +77,7 @@ angular.module('ngMapApp')
                   }),
               ],
               view: new ol.View({
-                zoom: maxZoom
+                maxZoom: maxZoom
               })
             });
             source.on('tileloadend', function() {
@@ -94,6 +95,8 @@ angular.module('ngMapApp')
             var mapSize = map.getSize();  // The size in pixels of the map in the DOM.
             var view = map.getView();      // The view that controls this map.
 
+            console.log('maxZoom: ',maxZoom);
+            console.log('maxZoom: ', view.getProperties());
             if ($routeParams.x && $routeParams.y) {
                 // console.log('Parameter x gefunden');
                 var xPixel = $routeParams.x;
@@ -107,26 +110,23 @@ angular.module('ngMapApp')
                 view.setZoom(maxZoom - 1);
             } else if (
                     $routeParams.x1 && $routeParams.y1 && $routeParams.x2 && $routeParams.y2
-                         && ( parseFloat($routeParams.x2) < imgWidth 
-                              || parseFloat($routeParams.y1) < imgHeight
-                        )
+                          && $routeParams.contains === 'true'
                     ) {
                 var x1Pixel = $routeParams.x1;
                 var y1Pixel = $routeParams.y1;
                 var x2Pixel = $routeParams.x2;
                 var y2Pixel = $routeParams.y2;
-                console.log('Extent: Pixel: ', [x1Pixel,y1Pixel,x2Pixel,y2Pixel]);
-                console.log('Map: Pixel: ', imgWidth, imgHeight);
+                // console.log('Extent: Pixel: ', [x1Pixel,y1Pixel,x2Pixel,y2Pixel]);
+                // console.log('Map: Pixel: ', imgWidth, imgHeight);
                 // console.log('Extent: ', extent);
                 // console.log('tileSizeTot ', $tileSizeTot);
                 var x1Map = extent[0] + (extent[2] - extent[0]) * x1Pixel / $tileSizeTot;
                 var y1Map = extent[3] - (extent[3] - extent[1]) * y1Pixel / $tileSizeTot;
                 var x2Map = extent[0] + (extent[2] - extent[0]) * x2Pixel / $tileSizeTot;
                 var y2Map = extent[3] - (extent[3] - extent[1]) * y2Pixel / $tileSizeTot;
-                console.log('Extent: Map: ', [x1Map,y1Map,x2Map,y2Map]);
+                // console.log('Extent: Map: ', [x1Map,y1Map,x2Map,y2Map]);
                 view.fitExtent([x1Map,y1Map,x2Map,y2Map], mapSize);
-                console.log('Zoom: ', view.getZoom());
-              
+//                console.log('Zoom: ', view.getZoom());
             } else {
             
               var $mapWidth  = (extent[2] - extent[0]) * imgWidth  / $tileSizeTot;
@@ -168,6 +168,10 @@ angular.module('ngMapApp')
 //              $('#mouse3857').text(ol.coordinate.toStringXY(coord3857, 2));
 //              $('#mouse4326').text(ol.coordinate.toStringXY(coord4326, 4));
 //            });
+            view.on('change:resolution', function() { 
+                console.log('Zoom: ', view.getZoom());
+            }); 
+
           }, function(error){
             console.log('ERRROR: ', error);
             alert('Fehler: ' + error);

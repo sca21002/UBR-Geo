@@ -5,6 +5,7 @@ use FindBin qw($Bin);
 use Path::Tiny;
 use lib path($Bin)->parent->child('lib')->stringify;
 use Test::More;
+use Test::Fatal;
 use Data::Dumper;
 
 BEGIN {
@@ -73,6 +74,14 @@ is(
     sprintf("%.0f %.0f", $x, $y), 
     '4503143 5421917', 
     "pixel(x,y) = (4503143, 5421917)"
+);
+
+like(
+    exception {
+        ($x, $y) = $geotransform->transform_invers(-81.9, 6.9, 4326);
+    },
+    qr/RuntimeError latitude or longitude exceeded limits/,
+    'caught exception in coordination transfomation'
 );
 
 done_testing();

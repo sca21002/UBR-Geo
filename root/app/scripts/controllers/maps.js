@@ -28,6 +28,7 @@ angular.module('ngMapApp')
         searchParams.setExtent(bbox);
     }
 
+
     if ($routeParams.project) {
         var project = $routeParams.project;
         searchParams.setProject(project);
@@ -84,17 +85,26 @@ angular.module('ngMapApp')
         $scope.$emit('ChangedMap', mapId); 
         var extent4326 = searchParams.getExtent();
         console.log('Extent(4326): ', extent4326);
+        var extent3857 = ol.proj.transformExtent(extent4326, 'EPSG:4326', 'EPSG:3857');
         mapService.getCoords(mapId, 
                 extent4326[0], extent4326[1], extent4326[2], extent4326[3], 
                 4326).then(
             function(data){
                 console.log(data);
                 var pixel = data.pixel;
+                var xCenter = extent3857[0] + ( extent3857[2] - extent3857[0]) /2;
+                var yCenter = extent3857[1] + ( extent3857[3] - extent3857[1]) /2;
+                mapService.contains(mapId, xCenter, yCenter).then(function(data){
+                    console.log('Contains: ',data);
+                    var contains = data.contains ? 'true' : 'false';
                 $location.path('/map/'+ mapId);
                 $location.search({ 
-                    x1: pixel[0], y1: pixel[1], x2: pixel[2], y2: pixel[3] 
+                    x1: pixel[0], y1: pixel[1], x2: pixel[2], y2: pixel[3], contains: contains 
                 });
                 console.log($location.absUrl());
+                });  
+            }, function(reason) {
+                $location.path('/map/'+ mapId);
             }
         );
 //        var searchObj = $location.search();

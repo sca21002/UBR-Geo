@@ -426,6 +426,14 @@ sub title_isbd {
     return  $title_isbd;
 }
 
+sub exemplar {
+    my $self = shift;
+
+    my $library = $self->isil->name;
+
+    my $line .= $library . ' -- ' . $self->call_number;
+    return $line;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
