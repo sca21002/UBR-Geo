@@ -109,8 +109,7 @@ angular.module('ngMapApp')
                 view.setCenter([xMap, yMap]);
                 view.setZoom(maxZoom - 1);
             } else if (
-                    $routeParams.x1 && $routeParams.y1 && $routeParams.x2 && $routeParams.y2
-                          && $routeParams.contains === 'true'
+                    $routeParams.x1 && $routeParams.y1 && $routeParams.x2 && $routeParams.y2 && $routeParams.contains === 'true'
                     ) {
                 var x1Pixel = $routeParams.x1;
                 var y1Pixel = $routeParams.y1;

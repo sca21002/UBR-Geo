@@ -103,7 +103,7 @@ angular.module('ngMapApp')
                 });
                 console.log($location.absUrl());
                 });  
-            }, function(reason) {
+            }, function() {
                 $location.path('/map/'+ mapId);
             }
         );

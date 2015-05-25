@@ -12,7 +12,7 @@ angular.module('ngMapApp')
           function($http, $q, searchParams) {
 
     var factory = {};
-    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
+    var urlBase = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
 
 
     factory.getList = function () {
@@ -111,7 +111,6 @@ angular.module('ngMapApp')
           deferred.resolve(data);
         }).error(function(){
           //Sending a friendly error message in case of failure
-          console.log("Error: fetching coordinates");
           deferred.reject('An error occured while fetching coordinates');
         });
         

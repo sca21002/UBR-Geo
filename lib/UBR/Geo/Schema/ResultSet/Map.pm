@@ -15,9 +15,6 @@ sub BUILDARGS { $_[2] }
 sub intersects_with_bbox {
     my ($self, $cond, $attrs) = @_;
 
-    warn "Cond: ", Dumper $cond;
-    warn "Attr: ", Dumper $attrs;
-
     my $xmin = delete $cond->{xmin};
     my $ymin = delete $cond->{ymin};
     my $xmax = delete $cond->{xmax};
