@@ -17,8 +17,8 @@ angular.module('ngMapApp')
       restrict: 'E',
       link: function postLink(scope, element) {
         var view = new ol.View({
-        center: ol.proj.transform([12.053, 48.941], 'EPSG:4326', 'EPSG:3857'),
-            zoom: 2
+            center: ol.proj.transform([12.053, 48.941], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 6,
         });
         var map = new ol.Map({
           target: element[0],
@@ -45,8 +45,11 @@ angular.module('ngMapApp')
                   collapsible: false,
               }),
           ],
-          view: view,
-          maxZoom: 0,
+        view: new ol.View({
+          center: ol.proj.transform([37.41, 8.82], 'EPSG:4326', 'EPSG:3857'),
+          zoom: 4
+        })
+//          view: view,
         });
 
         var center = searchParams.getCenter();
@@ -57,25 +60,26 @@ angular.module('ngMapApp')
             view.setZoom(10);
         } else {
             var extent4326 = searchParams.getExtent();
-            // console.log('Extent(4326): ', extent4326);
+            console.log('Extent(4326): ', extent4326);
             var setExtent3857 = ol.proj.transformExtent(extent4326, 'EPSG:4326', 'EPSG:3857');
-            // console.log('setExtent3857 1: ',setExtent3857);
+            console.log('setExtent3857 1: ',setExtent3857);
             var widthDelta  = (setExtent3857[2] - setExtent3857[0]) * 0.05; 
             var heightDelta = (setExtent3857[3] - setExtent3857[1]) * 0.05;
-            // console.log('widthDelta: ', widthDelta);
-            // console.log('heightDelta: ', heightDelta);
+            console.log('widthDelta: ', widthDelta);
+            console.log('heightDelta: ', heightDelta);
             setExtent3857[0] = setExtent3857[0] + widthDelta;
             setExtent3857[1] = setExtent3857[1] + heightDelta;
             setExtent3857[2] = setExtent3857[2] - widthDelta;
             setExtent3857[3] = setExtent3857[3] - heightDelta;
-            // console.log('setExtent3857 2: ',setExtent3857);
+            console.log('setExtent3857 2: ',setExtent3857);
 
             var size = map.getSize();
-            view.fitExtent(setExtent3857, size);
+            console.log('Map size: ', size);
+//            view.fitExtent(setExtent3857, size);
             var actualExtent3857 = view.calculateExtent( map.getSize() );
             var actualExtent4326 = ol.proj.transformExtent(actualExtent3857, 'EPSG:3857', 'EPSG:4326');
-            // console.log('setExtent3857 act ', actualExtent3857);
-            // console.log('Extent(4326 act): ', actualExtent4326);
+            console.log('setExtent3857 act ', actualExtent3857);
+            console.log('Extent(4326 act): ', actualExtent4326);
             searchParams.setExtent(actualExtent4326);
         }
            

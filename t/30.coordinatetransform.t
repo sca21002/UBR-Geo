@@ -84,4 +84,15 @@ like(
     'caught exception in coordination transfomation'
 );
 
+$geotransform = UBR::Geo::Geotransform::FromDB ->new(
+	map_id => 693,
+);
+($x,$y) = $geotransform->transform_invers(11.918074157714827,48.8938468470902,4326);
+
+diag "x,Y:  $x, $y";
+
+($x,$y) = $geotransform->transform_invers(12.122694519042954,48.97684268494547,4326);
+
+diag "x,Y: $x, $y";
+
 done_testing();

@@ -101,3 +101,7 @@ sub contains_point {
         }
     )->first;
 }
+
+__PACKAGE__->meta->make_immutable;
+1;
+

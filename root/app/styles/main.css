@@ -5,6 +5,10 @@
     margin-bottom: 0px;
 }
 
+.map {
+    height: 400px;
+}
+
 #maptitle {
     padding: 5px;
     border-bottom: 2px solid rgb(231,231,231);
