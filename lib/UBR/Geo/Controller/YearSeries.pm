@@ -32,14 +32,15 @@ sub maps_per_year :  Chained('statistics') PathPart('maps-per-year') Args(0) {
     my @rows;
     while (my $row = $maps_per_year->next) {
         my $href = { $row->get_columns() };
+        $href->{count} += 0;  # string --> numeric for correct type in JSON 
         push @rows, $href; 
     }    
  
-    my $response->{data} = \@rows;
+    my $response->{timelinedata} = [@rows];
 
     $c->stash(
         %$response,
-        current_view => 'JSON'
+        current_view => 'JSON_TL'
     );
 }
 
