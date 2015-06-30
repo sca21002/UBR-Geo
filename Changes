@@ -1,7 +1,7 @@
 This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
-
+    - Add a slider for year range
     - Provide data for a maps per year histogramm 
 
 0.008     2015-05-24 18:19:13+02:00 Europe/Berlin

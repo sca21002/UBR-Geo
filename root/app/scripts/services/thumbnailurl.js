@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name ngMapApp.thumbnailURL
+ * @name ubrGeoApp.thumbnailURL
  * @description
  * # thumbnailURL
- * Factory in the ngMapApp.
+ * Factory in the ubrGeoApp.
  */
-angular.module('ngMapApp')
+angular.module('ubrGeoApp')
   .factory('thumbnailURL', function () {
     return function (pid) {
         var url = 'http://digital.bib-bvb.de/webclient/DeliveryManager?pid=';

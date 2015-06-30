@@ -1,39 +1,27 @@
-/* This line is necessary for Angular UI */
-.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
-
-.navbar {
-    margin-bottom: 0px;
+.data {
+  fill: steelblue;
+  clip-path: url(#clip);
 }
 
-.map {
-    height: 400px;
+#year-range {
+    width: 100%;
 }
 
-#maptitle {
-    padding: 5px;
-    border-bottom: 2px solid rgb(231,231,231);
-    margin-bottom: 5px;
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
-#mapdetail-title {
-    padding-left: 5px;
-}
-
-#exemplar {
-    padding-left: 5px;
-    padding-bottom: 5px;
-}
-
-#ol-map {
-    height: 600px;    
-}
-
-.thumbnail-map {
-    height: 75px;
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
 }
 
 .ol-viewport {
-    border: 1px solid rgb(231,231,231);
+    background: #cccccc;
 }
 
 .browsehappy {
@@ -99,10 +87,9 @@ body {
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
-/*  .container {
+  .container {
     max-width: 730px;
   }
-*/
 
   /* Remove the padding we set earlier */
   .header,

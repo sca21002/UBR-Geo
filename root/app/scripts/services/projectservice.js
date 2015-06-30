@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name ngMapApp.projectService
+ * @name ubrGeoApp.projectService
  * @description
  * # projectService
- * Factory in the ngMapApp.
+ * Factory in the ubrGeoApp.
  */
-angular.module('ngMapApp')
+angular.module('ubrGeoApp')
   .factory('projectService', function () {
 
     var projects = [

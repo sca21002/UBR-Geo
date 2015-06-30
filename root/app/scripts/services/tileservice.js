@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc service
- * @name ngMapApp.tileService
+ * @name ubrGeoApp.tileService
  * @description
  * # tileService
- * Factory in the ngMapApp.
+ * Factory in the ubrGeoApp.
  */
-angular.module('ngMapApp')
-  .factory('tileService', ['$http', '$q', function ($http,$q) {
+angular.module('ubrGeoApp')
+  .factory('tileService', function ($http, $q) {
   
     var factory = {};
     
@@ -34,5 +34,4 @@ angular.module('ngMapApp')
     };
 
     return factory;
-
-  }]);
+  });

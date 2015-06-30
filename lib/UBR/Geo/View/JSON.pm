@@ -8,8 +8,8 @@ use base 'Catalyst::View::JSON';
 
 __PACKAGE__->config({
     expose_stash => [ qw(
-        maps maps_total page pixel detail contains data
-    ) ],
+        maps maps_total page pixel detail contains data maps_per_year
+        ) ],
 });
 
 =head1 NAME

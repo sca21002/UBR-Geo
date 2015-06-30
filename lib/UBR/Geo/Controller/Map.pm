@@ -9,6 +9,7 @@ use Data::Dumper;
 use UBR::Geo::Geotransform::Simple;
 use JSON;
 use Try::Tiny;
+use DBIx::Class::ResultClass::HashRefInflator;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -42,6 +43,8 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     my $bbox = $c->req->params->{bbox} || '8.98,47.27,13.83,50.56';
     my $isil = $c->req->params->{isil};
     my $project = $c->req->params->{project}; 
+    my $year_min = $c->req->params->{year_min};
+    my $year_max = $c->req->params->{year_max};
 
     $c->log->debug('BBox: ' . $bbox);
     my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
@@ -50,7 +53,27 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     $c->log->debug("Page: $page");
     my $entries_per_page = 5;
 
+    my $cond = {
+        xmin    => $xmin, 
+        ymin    => $ymin, 
+        xmax    => $xmax,
+        ymax    => $ymax,
+        isil    => $isil,
+        project => $project,
+    };
+    push @{$cond->{'-and'}}, { year => { '>=' => $year_min } } if $year_min;
+    push @{$cond->{'-and'}}, { year => { '<=' => $year_max } } if $year_max;
+
     my $map_rs = $c->stash->{map_rs}->intersects_with_bbox(
+        $cond,
+        {
+            page => $page,
+            rows => $entries_per_page,
+            
+        },
+    );
+
+    my @maps_per_year = $c->stash->{map_rs}->maps_per_year(
 	    { 
 	        xmin    => $xmin, 
             ymin    => $ymin, 
@@ -59,12 +82,16 @@ sub list : Chained('maps') PathPart('list') Args(0) {
             isil    => $isil,
             project => $project,
         },
-        {
-            page => $page,
-            rows => $entries_per_page,
-            
-        },
-    );
+        { result_class => 'DBIx::Class::ResultClass::HashRefInflator' }
+    )->all;
+
+    foreach my $year (@maps_per_year) {
+        $year->{count} += 0;
+        $c->log->croak('Year is undefinded') unless defined $year->{year};
+    }
+
+    my $response->{maps_per_year} = [ @maps_per_year ];
+
     my @rows;
     while (my $row = $map_rs->next) {
         my $href = { $row->get_columns() };
@@ -74,7 +101,7 @@ sub list : Chained('maps') PathPart('list') Args(0) {
         push @rows, $href; 
     }    
  
-    my $response->{maps} = \@rows;
+    $response->{maps} = \@rows;
 
     $response->{page}    = $page;
     #$response->{total}   = $map_rs->pager->last_page;

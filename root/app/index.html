@@ -8,15 +8,15 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <!-- endbower -->
-    <link rel="stylesheet" href="bower_components/openlayers/ol.css" />
+    <link rel="stylesheet" href="bower_components/openlayers3/build/ol.css" />
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/mystyle.css">
     <!-- endbuild -->
   </head>
-  <body ng-app="ngMapApp" ng-controller="MasterCtrl">
+  <body ng-app="ubrGeoApp" ng-controller="MasterCtrl">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -24,7 +24,7 @@
     <!-- Add your site or application content here -->
     <div class="header">
       <div class="navbar navbar-default" role="navigation">
-        <div class="container">
+        <div class="container-fluid">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
               <span class="sr-only">Toggle navigation</span>
@@ -41,40 +41,41 @@
               <li><a ng-href="#/map/{{mapId}}">Detail</a></li>
               <li><a ng-href="#/about">&Uuml;ber</a></li>
             </ul>
-            <div>
+          <div ng-show="$route.current.scope.name == 'MapsCtrl'">
               <form class="navbar-form navbar-left" role="search">
-                <div class="form-group">
-                 <label for="selectproject">Projekt:</label>
-                 <select id="selectproject" class="form-control" 
-                   ng-model="project" 
-                   ng-options="project.short as project.name for project in projects" ng-change="projectChanged()">
-                   <option value="">alle Karten</option>
-                 </select>
-                </div>  
-              </form>
-              <form class="navbar-form navbar-left" role="search">
-                <div class="form-group">
-                  <label for="selectlibrary">Bestand:</label>
-                  <select id="selectlibrary" class="form-control" ng-model="library" 
-                    ng-options="library.isil as library.name for library in libraries" ng-change="libraryChanged()">
-                    <option value="">alle Bibl.</option>
-                  </select>
-                </div>    
-              </form>
-            </div>  
-          </div>
-        </div>
+              <div class="form-group">
+                <label for="selectproject">Projekt:</label>
+                <select id="selectproject" class="form-control" 
+                  ng-model="project" 
+                  ng-options="project.short as project.name for project in projects" ng-change="projectChanged()">
+                  <option value="">alle Karten</option>
+                </select>
+              </div>  
+            </form>
+            <form class="navbar-form navbar-left" role="search">
+              <div class="form-group">
+                <label for="selectlibrary">Bestand:</label>
+                <select id="selectlibrary" class="form-control" ng-model="library" 
+                  ng-options="library.isil as library.name for library in libraries" ng-change="libraryChanged()">
+                  <option value="">alle Bibl.</option>
+                </select>
+              </div>    
+            </form>
+          </div>  
+        </div>  
       </div>
     </div>
+
     <div class="container-fluid">
-    <div ng-view=""></div>
+      <div ng-view=""></div>
     </div>
 
     <div class="footer">
-      <div class="container">
-        <p>ubrGeo - Universitätsbibliothek Regensburg</p>
+      <div class="container-fluid">
+          <p>ubrGeo - Universitätsbibliothek Regensburg</p>
       </div>
     </div>
+
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
@@ -90,8 +91,11 @@
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="bower_components/spin-js/spin.js"></script>
     <script src="bower_components/proj4/dist/proj4.js"></script>
+    <script src="bower_components/angular-openlayers-directive/dist/angular-openlayers-directive.min.js"></script>
+    <script src="bower_components/spin.js/spin.js"></script>
+    <script src="bower_components/angular-spinner/angular-spinner.js"></script>
     <!-- endbower -->
-    <script src="bower_components/openlayers/ol-debug.js"></script>     
+    <script src="bower_components/openlayers3/build/ol-debug.js"></script>
     <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
@@ -99,17 +103,19 @@
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/about.js"></script>
         <script src="scripts/controllers/maps.js"></script>
-        <script src="scripts/directives/olmap.js"></script>
-        <script src="scripts/directives/olmapdetail.js"></script>
-        <script src="scripts/services/mapservice.js"></script>
-        <script src="scripts/services/searchparams.js"></script>
-        <script src="scripts/services/thumbnailurl.js"></script>
         <script src="scripts/services/mapboxurl.js"></script>
-        <script src="scripts/services/projectservice.js"></script>
+        <script src="scripts/services/mapservice.js"></script>
+        <script src="scripts/services/thumbnailurl.js"></script>
+        <script src="scripts/services/mapservice.js"></script>
+        <script src="scripts/services/helpers.js"></script>
         <script src="scripts/services/libraryservice.js"></script>
+        <script src="scripts/services/projectservice.js"></script>
+        <script src="scripts/services/searchparams.js"></script>
         <script src="scripts/controllers/mapdetail.js"></script>
-        <script src="scripts/controllers/master.js"></script>
         <script src="scripts/services/tileservice.js"></script>
+        <script src="scripts/controllers/master.js"></script>
+        <script src="scripts/directives/yearrangeslider.js"></script>
+        <script src="scripts/services/d3.js"></script>
         <!-- endbuild -->
 </body>
 </html>

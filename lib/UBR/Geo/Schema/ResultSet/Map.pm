@@ -20,7 +20,7 @@ sub intersects_with_bbox {
     my $xmax = delete $cond->{xmax};
     my $ymax = delete $cond->{ymax};
     my $project = delete $cond->{project};
-    delete $cond->{isil} unless $cond->{isil};
+    delete $cond->{isil} unless $cond->{isil};  # only if valid isil
     my $srt  = 4326; 
 
     my $envelope   = 'ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?), 3857)';
@@ -35,6 +35,8 @@ sub intersects_with_bbox {
         $cond = { %$cond, 'project.short' => $project };
     }
 
+
+    $attrs = {} unless ref $attrs eq 'HASH';
     $attrs = {
     	%$attrs,
         join   => $join,
@@ -63,6 +65,7 @@ sub intersects_with_bbox {
         $attrs,
     );
 }
+
 
 sub find_with_geojson {
     my $self = shift;
@@ -100,6 +103,55 @@ sub contains_point {
             
         }
     )->first;
+}
+
+sub maps_per_year {
+    my ($self, $cond, $attrs) = @_;
+
+    my $xmin = delete $cond->{xmin};
+    my $ymin = delete $cond->{ymin};
+    my $xmax = delete $cond->{xmax};
+    my $ymax = delete $cond->{ymax};
+    my $project = delete $cond->{project};
+    delete $cond->{isil} unless $cond->{isil};
+    my $srt  = 4326; 
+
+    my $envelope   = 'ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?), 3857)';
+    my $area_intsec 
+        = 'ST_Area(ST_Intersection(boundary.boundary_wld, ' . $envelope . '))';
+
+    my $join = [ 'boundary' ];
+    if ($project) {
+        push @$join, 'project' if $project;
+        $cond = { %$cond, 'project.short' => $project };
+    }
+
+    $attrs = {} unless ref $attrs eq 'HASH';
+    $attrs = {
+    	%$attrs,
+        join   => $join,
+        select => [
+            'year',
+            {count => 'year'},
+        ],
+        as     => [qw(year count)],
+        group_by => 'year',
+        order_by => 'year',        
+    };
+
+
+    return $self->search({
+        -and => [
+        \[
+            $area_intsec . ' > 0',
+            $xmin, $ymin, $xmax, $ymax, $srt
+         ],
+         scale => { '>' => 0 },
+         year  => { '!=' => undef },
+         $cond,
+        ]}, 
+        $attrs,
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

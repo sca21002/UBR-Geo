@@ -2,23 +2,25 @@
 
 /**
  * @ngdoc overview
- * @name ngMapApp
+ * @name ubrGeoApp
  * @description
- * # ngMapApp
+ * # ubrGeoApp
  *
  * Main module of the application.
  */
 angular
-  .module('ngMapApp', [
+  .module('ubrGeoApp', [
     'ngAnimate',
     'ngCookies',
     'ngResource',
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-    'ui.bootstrap'
-    ])
-  .config(['$routeProvider', function ($routeProvider) {
+    'openlayers-directive',
+    'ui.bootstrap',
+    'angularSpinner'
+  ])
+  .config(function ($routeProvider) {
     $routeProvider
       .when('/about', {
         templateUrl: 'views/about.html',
@@ -35,4 +37,4 @@ angular
       .otherwise({
         redirectTo: '/maps'
       });
-  }]);
+  });

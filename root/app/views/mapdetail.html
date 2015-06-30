@@ -1,18 +1,26 @@
-<div class="container-fluid" id="content">
-<!--    <p>
-    EPSG:3857 <span id="mouse3857" class="label label-info">0 / 0</span>
-    EPSG:4326 <span id="mouse4326" class="label label-info">0 / 0</span>
-    </p>
--->    
-    <div id="map-container">
-      <div id="mapdetail-title">
-        {{isbd}}
-      </div>
-      <div id = "exemplar">
-          {{exemplar}}
-      </div>    
-    <ol-map-detail class="map-detail">
-    </ol-map-detail>
-  </div>
-</div>  
+<div id="mapdetail-title">
+  {{isbd}}
+</div>
+<div id = "exemplar">
+    {{exemplar}}
+</div>    
+<span us-spinner spinner-key="spinner-1" spinner-start-active="true"></span>
+<openlayers id="map-nav" ol-defaults="defaults" custom-layers="true" ol-extent="myextent">
+  <ol-layer ol-layer-properties="bvb"></ol-layer> 
+  <ol-control name="attribution" ol-control-properties="attrib"></ol-control>  
+  <ol-control name="fullscreen"></ol-control> 
+</openlayers>
+
+<h1>Events defaults example</h1>
+<p>In this example we propagate two events in our map, the mouse position and the mouse click.</p>
+<p>Set desired projection:
+    <input type="button" ng-click="projection='EPSG:3857'" value="EPSG:3857" />
+    <input type="button" ng-click="projection='EPSG:4326'" value="EPSG:4326" />
+</p>
+<h3>Mouse position</h3>
+<pre ng-bind="mouseposition | json"></pre>
+<h3>Mouse click position</h3>
+<pre ng-bind="mouseclickposition | json"></pre>
+<h3>Zoom</h3>
+<pre ng-bind="mouseclickposition | json"></pre>
 

@@ -2,39 +2,45 @@
 
 /**
  * @ngdoc service
- * @name ngMapApp.searchParams
+ * @name ubrGeoApp.searchParams
  * @description
  * # searchParams
- * Factory in the ngMapApp.
+ * Factory in the ubrGeoApp.
  */
-angular.module('ngMapApp')
+angular.module('ubrGeoApp')
   .factory('searchParams', ['projectService', 'libraryService', 
           function (projectService, libraryService) {
 
     var data = {
-        center:  [],
-        extent:  [8.98,47.27,13.83,50.56],
+        center:  {
+            lon:   12.053,
+            lat:   48.941,
+            zoom:  10,
+            "bounds": []
+        },
+        name: undefined,
         page: 1,
         project: projectService.default(),
         library: libraryService.default(),
+        yearExtent: [],
     };
     
     var factory = {};
-
-    factory.getExtent = function() {
-        return data.extent;
-    };
-
-    factory.setExtent = function(extent) {
-        data.extent = extent;
-    };
 
     factory.getCenter = function() {
         return data.center;
     };
 
-    factory.setCenter = function(extent) {
-        data.center = extent;
+    factory.setCenter = function(center) {
+        angular.extend(data.center, center);
+    };
+
+    factory.getName = function() {
+        return data.name;
+    };
+
+    factory.setName = function(name) {
+        data.name = name;
     };
 
     factory.getPage = function() {
@@ -59,6 +65,16 @@ angular.module('ngMapApp')
 
     factory.setLibrary = function(library) {
         data.library = library;
+    };
+    
+    factory.getYearExtent = function() {
+        return data.yearExtent; 
+    };    
+
+    factory.setYearExtent = function(yearExtent) {
+        console.log('searchparams: ', yearExtent);
+        angular.copy(yearExtent, data.yearExtent);
+        console.log('searchparams: ', data.yearExtent);
     };
     
     return factory; 

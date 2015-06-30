@@ -2,21 +2,15 @@
 
 /**
  * @ngdoc function
- * @name ngMapApp.controller:MasterCtrl
+ * @name ubrGeoApp.controller:MasterCtrl
  * @description
  * # MasterCtrl
- * Controller of the ngMapApp
+ * Controller of the ubrGeoApp
  */
-angular.module('ngMapApp')
-  .controller('MasterCtrl', [ 
-          '$scope', 'projectService', 'libraryService', 'searchParams',
-          function ($scope, projectService, libraryService, searchParams) {
+angular.module('ubrGeoApp')
+  .controller('MasterCtrl', function ($scope, $route, libraryService, projectService, searchParams) {
 
-    $scope.map = { mapId: 1 };              
-    $scope.$on('ChangedMap', function (event, mapId) {
-          $scope.mapId = mapId;
-    });
-
+    $scope.$route = $route;
 
     $scope.projects = projectService.load(); 
     $scope.project = searchParams.getProject();
@@ -42,4 +36,4 @@ angular.module('ngMapApp')
         $scope.library = library;
     });
 
-}]);
+  });

@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name ngMapApp.libraryService
+ * @name ubrGeoApp.libraryService
  * @description
  * # libraryService
- * Factory in the ngMapApp.
+ * Factory in the ubrGeoApp.
  */
-angular.module('ngMapApp')
+angular.module('ubrGeoApp')
   .factory('libraryService', function () {
 
     var libraries = [

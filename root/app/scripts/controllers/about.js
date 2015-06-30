@@ -2,16 +2,16 @@
 
 /**
  * @ngdoc function
- * @name ngMapApp.controller:AboutCtrl
+ * @name ubrGeoApp.controller:AboutCtrl
  * @description
  * # AboutCtrl
- * Controller of the ngMapApp
+ * Controller of the ubrGeoApp
  */
-angular.module('ngMapApp')
-  .controller('AboutCtrl', ['$scope', function ($scope) {
+angular.module('ubrGeoApp')
+  .controller('AboutCtrl', function ($scope) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-  }]);
+  });
