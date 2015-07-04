@@ -7,6 +7,9 @@
  * # MapsCtrl
  * Controller of the ubrGeoApp
  */
+
+/*global proj4, ol*/
+
 angular.module('ubrGeoApp')
   .controller('MapsCtrl', function (
     $http, $location, $scope, helpers, searchParams, mapboxURL, mapservice, $routeParams, thumbnailURL) {
@@ -14,6 +17,7 @@ angular.module('ubrGeoApp')
       $scope.name = 'MapsCtrl';
 
       var isValidExtent = helpers.isValidExtent;
+      var center;
 
       if ($routeParams.project) {
           var project = $routeParams.project;
@@ -34,7 +38,7 @@ angular.module('ubrGeoApp')
           proj4.defs('EPSG:31468','+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +datum=potsdam +units=m +no_defs');
           var coord4326 = ol.proj.transform([x,y], 'EPSG:31468', 'EPSG:4326');        
           console.log(coord4326);
-          var center = { lon: coord4326[0], lat: coord4326[1] };
+          center = { lon: coord4326[0], lat: coord4326[1] };
           searchParams.setCenter(center);
       }
 
@@ -42,7 +46,7 @@ angular.module('ubrGeoApp')
           searchParams.setName($routeParams.name);
       }
 
-      var center        = searchParams.getCenter();
+      center        = searchParams.getCenter();
       
      
       angular.extend( $scope, {
@@ -66,13 +70,13 @@ angular.module('ubrGeoApp')
           type: 'GeoJSON',
           geojson: {
             object: {
-              "type": "FeatureCollection",
-              "features": [
+              type: 'FeatureCollection',
+              features: [
                 {
-                  "type": "Feature",
-                  "geometry": {
-                    "type": "Point",
-                    "coordinates": [ 0, 0 ] 
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [ 0, 0 ] 
                   }
                 } 
               ]
@@ -126,7 +130,7 @@ angular.module('ubrGeoApp')
     };
 
     $scope.pageChanged = function() {
-        if ( $scope.currentPage != searchParams.getPage() ) {
+        if ( $scope.currentPage !== searchParams.getPage() ) {
             searchParams.setPage($scope.currentPage);
             getMaps();
         }    

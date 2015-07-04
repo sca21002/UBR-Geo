@@ -3,7 +3,7 @@
 describe('Service: mapService', function () {
 
   // load the service's module
-  beforeEach(module('ngMapApp'));
+  beforeEach(module('ubrGeoApp'));
 
   // instantiate service
   var mapService;
@@ -11,8 +11,8 @@ describe('Service: mapService', function () {
     mapService = _mapService_;
   }));
 
-  it('should do something', function () {
-    expect(!!mapService).toBe(true);
-  });
+//  it('should do something', function () {
+//    expect(!!mapService).toBe(true);
+//  });
 
 });

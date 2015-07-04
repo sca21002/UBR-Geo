@@ -1,3 +1,7 @@
 .thumbnail-map {
     height: 75px;
 }
+
+#map-nav {
+    margin-bottom: 10px;
+}

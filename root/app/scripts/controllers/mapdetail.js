@@ -7,6 +7,10 @@
  * # MapdetailCtrl
  * Controller of the ubrGeoApp
  */
+
+/*jslint devel: true*/
+/*global ol*/
+
 angular.module('ubrGeoApp')
   .controller('MapdetailCtrl', function ($scope, $q, $routeParams, libraryService, mapservice, tileService, usSpinnerService) {
 
@@ -56,16 +60,17 @@ angular.module('ubrGeoApp')
             
                         // tile size is calculated from max zoom level and size of a single tile          
                         var $tileSizeTot = Math.pow(2, maxZoom) * tileSize;
-                        
+                       
+                        var x1Map, y1Map, x2Map, y2Map;
                         if (data.contains) {
-                            var x1Map = bounds3857[0] + (bounds3857[2] - bounds3857[0]) * pixel[0] / $tileSizeTot;
-                            var y1Map = bounds3857[3] - (bounds3857[3] - bounds3857[1]) * pixel[1] / $tileSizeTot;
-                            var x2Map = bounds3857[0] + (bounds3857[2] - bounds3857[0]) * pixel[2] / $tileSizeTot;
-                            var y2Map = bounds3857[3] - (bounds3857[3] - bounds3857[1]) * pixel[3] / $tileSizeTot;
+                            x1Map = bounds3857[0] + (bounds3857[2] - bounds3857[0]) * pixel[0] / $tileSizeTot;
+                            y1Map = bounds3857[3] - (bounds3857[3] - bounds3857[1]) * pixel[1] / $tileSizeTot;
+                            x2Map = bounds3857[0] + (bounds3857[2] - bounds3857[0]) * pixel[2] / $tileSizeTot;
+                            y2Map = bounds3857[3] - (bounds3857[3] - bounds3857[1]) * pixel[3] / $tileSizeTot;
                             angular.copy([x1Map, y1Map, x2Map, y2Map], coord);
                         } else {
-                            var x2Map = bounds3857[0] + (bounds3857[2] - bounds3857[0]) * imgWidth  / $tileSizeTot;
-                            var y1Map = bounds3857[3] - (bounds3857[3] - bounds3857[1]) * imgHeight / $tileSizeTot;
+                            x2Map = bounds3857[0] + (bounds3857[2] - bounds3857[0]) * imgWidth  / $tileSizeTot;
+                            y1Map = bounds3857[3] - (bounds3857[3] - bounds3857[1]) * imgHeight / $tileSizeTot;
                             angular.copy([bounds3857[0], y1Map, x2Map, bounds3857[3]], coord);                  
                         }
                         $scope.myextent.coord = coord;
@@ -74,7 +79,7 @@ angular.module('ubrGeoApp')
                         $scope.bvb.source.filename = filename;
                         $scope.bvb.source.maxZoom = maxZoom; // seems as if it doesn't work
                     }, function(error) {
-                            alert('Ein Fehler ist aufgetreten!');
+                            alert('Ein Fehler ist aufgetreten: ' + error);
                     });
             });    
         });
@@ -126,7 +131,7 @@ angular.module('ubrGeoApp')
                     lat: p[1],
                     lon: p[0],
                     projection: $scope.projection
-                }
+                };
             }
         });
     });
@@ -142,12 +147,12 @@ angular.module('ubrGeoApp')
                     lat: p[1],
                     lon: p[0],
                     projection: $scope.projection
-                }
+                };
             }
         });
     });
 
-    $scope.$on('openlayers.bvb.tileloadend', function(event, data) {
+    $scope.$on('openlayers.bvb.tileloadend', function() {
         $scope.$apply(function() {
             console.log('Tile loaded');
             usSpinnerService.stop('spinner-1');

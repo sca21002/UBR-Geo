@@ -9,7 +9,7 @@
 
 /*global ol*/
 
-angular.module('ngMapApp')
+angular.module('ubrGeoApp')
   .directive('olMap', ['searchParams', 'mapboxURL', 
     function (searchParams, mapboxURL) {
     return {

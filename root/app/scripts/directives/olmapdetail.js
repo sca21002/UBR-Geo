@@ -9,7 +9,7 @@
 
 /*global ol, Spinner, alert*/
 
-angular.module('ngMapApp')
+angular.module('ubrGeoApp')
   .directive('olMapDetail', [ '$routeParams', 'mapService', 'tileService', 
           'libraryService',
           function ($routeParams, mapService, tileService, libraryService) {

@@ -11,8 +11,8 @@ angular.module('ubrGeoApp')
   .factory('mapservice', function ($q, $http, searchParams) {
 
     var factory = {};
-//    var urlBase = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
-    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
+    var urlBase = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
+//    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
 
     factory.getList = function () {
 
@@ -136,7 +136,7 @@ angular.module('ubrGeoApp')
         
       //Returning the promise object
       return deferred.promise;
-    }
+    };
 
     return  factory;
   });

@@ -3,7 +3,7 @@
 describe('Service: thumbnailURL', function () {
 
   // load the service's module
-  beforeEach(module('ngMapApp'));
+  beforeEach(module('ubrGeoApp'));
 
   // instantiate service
   var thumbnailURL;

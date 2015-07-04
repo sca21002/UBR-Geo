@@ -3,7 +3,7 @@
 describe('Service: projectService', function () {
 
   // load the service's module
-  beforeEach(module('ngMapApp'));
+  beforeEach(module('ubrGeoApp'));
 
   // instantiate service
   var projectService;

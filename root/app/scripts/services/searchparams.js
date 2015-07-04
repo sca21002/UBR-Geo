@@ -16,7 +16,7 @@ angular.module('ubrGeoApp')
             lon:   12.053,
             lat:   48.941,
             zoom:  10,
-            "bounds": []
+            'bounds': []
         },
         name: undefined,
         page: 1,

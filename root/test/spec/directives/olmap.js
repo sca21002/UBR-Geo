@@ -3,7 +3,7 @@
 describe('Directive: olMap', function () {
 
   // load the directive's module
-  beforeEach(module('ngMapApp'));
+  beforeEach(module('ubrGeoApp'));
 
   var /* element, */
     scope;

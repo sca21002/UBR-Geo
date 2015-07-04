@@ -3,7 +3,7 @@
 describe('Controller: MasterCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('ngMapApp'));
+  beforeEach(module('ubrGeoApp'));
 
   var MasterCtrl,
     scope;
