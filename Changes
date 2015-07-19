@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
 
+0.011     2015-07-19 15:32:17+02:00 Europe/Berlin
+
     - Add search for keywords
 
 0.010     2015-07-04 19:06:25+02:00 Europe/Berlin
