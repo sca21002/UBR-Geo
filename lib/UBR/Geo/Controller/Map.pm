@@ -45,6 +45,7 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     my $project = $c->req->params->{project}; 
     my $year_min = $c->req->params->{year_min};
     my $year_max = $c->req->params->{year_max};
+    my $search = $c->req->params->{search};
 
     $c->log->debug('BBox: ' . $bbox);
     my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
@@ -64,7 +65,14 @@ sub list : Chained('maps') PathPart('list') Args(0) {
     push @{$cond->{'-and'}}, { year => { '>=' => $year_min } } if $year_min;
     push @{$cond->{'-and'}}, { year => { '<=' => $year_max } } if $year_max;
 
-    my $map_rs = $c->stash->{map_rs}->intersects_with_bbox(
+
+    my $map_rs_base = $c->stash->{map_rs};
+    if ($search) {
+        $c->log->debug('Search: ' . $search);
+        $map_rs_base = $map_rs_base->filter($search); 
+    }
+  
+    my $map_rs = $map_rs_base->intersects_with_bbox(
         $cond,
         {
             page => $page,
@@ -73,7 +81,7 @@ sub list : Chained('maps') PathPart('list') Args(0) {
         },
     );
 
-    my @maps_per_year = $c->stash->{map_rs}->maps_per_year(
+    my @maps_per_year = $map_rs_base->maps_per_year(
 	    { 
 	        xmin    => $xmin, 
             ymin    => $ymin, 

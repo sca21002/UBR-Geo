@@ -63,6 +63,14 @@
                 </select>
               </div>    
             </form>
+            <form class="navbar-form navbar-left" role="search" ng-submit="searchChanged()">
+                <div class="form-group">
+                    <label for="Search">Suche:</label>
+                    <input ng-model="search" type="text" class="form-control" id="Search" 
+                        placeholder="Suchbegriff">
+                    <button type="submit" class="btn btn-default">Los</button>    
+                </div>
+            </form> 
           </div>  
         </div>  
       </div>
@@ -98,6 +106,19 @@
     <script src="bower_components/d3/d3.js"></script>
     <!-- endbower -->
     <script src="bower_components/openlayers3/build/ol-debug.js"></script>
+<!--    <script src="bower_components/angular-openlayers-directive/dist/angular-openlayers-directive.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/openlayers.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/center.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/control.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/extent.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/layer.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/marker.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/path.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/directives/view.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/services/olData.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/services/olHelpers.js"></script>
+    <script src="bower_components/angular-openlayers-directive/src/services/olMapDefaults.js"></script>
+-->
     <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->

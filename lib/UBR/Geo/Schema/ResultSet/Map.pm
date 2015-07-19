@@ -66,6 +66,31 @@ sub intersects_with_bbox {
     );
 }
 
+sub _cross {
+    my $columns = shift || [];
+    my $tokens  = shift || [];
+    map {s/%/\\%/g} @$tokens;
+    
+    my @result;
+    foreach my $token (@$tokens) {
+        push @result, [ map +{ $_ => {like => "%$token%"} }, @$columns ];    
+    }
+    return @result;
+}
+
+sub filter {
+    my ($self, $searchstr) = @_;
+
+    my @columns = qw( 
+        mab100 mab104 mab108 mab112 mab331 mab400 mab410 mab451 mab590a 
+        u_mab089 u_mab331 call_number bvnr
+    );
+    my @tokens = split /\s+/, $searchstr;
+    my @conds = _cross(\@columns, \@tokens);
+ 
+    return $self->search( { -and => \@conds } );
+}
+
 
 sub find_with_geojson {
     my $self = shift;

@@ -46,15 +46,9 @@ angular.module('ubrGeoApp')
           scope.$apply();
       }
 
-      function brushstart() {
-        console.log('Start: ', brush.extent());
-      }
-    
-
       var brush = d3.svg.brush()
           .x(x)
           .on('brush', brushmove)
-          .on('brushstart', brushstart)
           .on('brushend', brushend);
 
       var year_min = d3.min(data.map(function(d) { return d.year; }));
@@ -69,7 +63,6 @@ angular.module('ubrGeoApp')
       } else {
         scope.yearmin = year_min;
         scope.yearmax = year_max;
-        console.log('Test: ', scope.yearmin,scope.yearmax); 
       }
 
 
@@ -111,16 +104,14 @@ angular.module('ubrGeoApp')
           .attr('height', height + 7);
        
       scope.redrawExtent = function(newExtent) {
-        console.log('newExtent(redraw): ', newExtent);
         if (newExtent[0] === year_min && newExtent[1] === year_max) {
             brush.clear();
         } else {
-            var yearExtent = newExtent.map(function(d) { return yearFormat.parse(d.toString()) });
-            console.log('yearExtent(redraw): ', yearExtent);
+            var yearExtent = newExtent.map(function(d) { return yearFormat.parse(d.toString()); });
             brush.extent(yearExtent);
         }    
         svg.select('.brush').call(brush);  // redraw brush
-      }
+      };
 
        
     };
@@ -173,12 +164,10 @@ angular.module('ubrGeoApp')
                 }
                 if (scope.extent[0] !== scope.yearmin || scope.extent[1] !== scope.yearmax ) {
                     var newExtent = [scope.yearmin, scope.yearmax];
-                    console.log('newExtent (nach action1): ',newExtent);
                     scope.action({ newExtent: newExtent });
-                    console.log('newExtent (nach action2): ',newExtent);
                     scope.redrawExtent(newExtent);
                 }
-          }
+          };
 
           angular.element($window).bind('resize', function () {
               if (angular.isArray(scope.data)) {

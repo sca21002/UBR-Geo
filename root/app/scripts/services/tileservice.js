@@ -20,7 +20,6 @@ angular.module('ubrGeoApp')
       $http.get(
         'http://digipool.bib-bvb.de/bvb/anwender/CORS/get_imageinfo.pl?pid=' + pid
         ).success(function(data) { 
-          // console.log("Get image info");  
           //Passing data to deferred's resolve function on successful completion
           deferred.resolve(data);
         }).error(function(){

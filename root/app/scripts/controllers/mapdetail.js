@@ -24,11 +24,13 @@ angular.module('ubrGeoApp')
       parseFloat($routeParams.x2), 
       parseFloat($routeParams.y2)
     ];
+
     var extent3857 = ol.proj.transformExtent(extent4326, 'EPSG:4326','EPSG:3857');
-    
+
     var xCenter = extent3857[0] + ( extent3857[2] - extent3857[0]) /2;
     var yCenter = extent3857[1] + ( extent3857[3] - extent3857[1]) /2;
 
+    
     // extent of the whole world in pseudo mercator projection
     // calculated from WGS 84 (lat: -180° .. 180° lon: -85° .. 85°)    
     var bounds3857 = ol.proj.transformExtent([-180,-85,180,85], 'EPSG:4326','EPSG:3857');
@@ -57,7 +59,7 @@ angular.module('ubrGeoApp')
                         this.push(parseFloat(coord));    
                     }, pixel);
                     mapservice.contains(mapId, xCenter, yCenter).then(function(data){
-            
+                        
                         // tile size is calculated from max zoom level and size of a single tile          
                         var $tileSizeTot = Math.pow(2, maxZoom) * tileSize;
                        
@@ -88,6 +90,7 @@ angular.module('ubrGeoApp')
     angular.extend($scope, {
         myextent: {
                 coord: [-20026376.39, -20048966.10, 20026376.39, 20048966.10],
+                // coord: [-31249903.14788518, -10841662.708883908, 14088873.053523686, 14681469.042702653],
                 projection: 'EPSG:3857'
         },
         bvb: {
@@ -154,7 +157,6 @@ angular.module('ubrGeoApp')
 
     $scope.$on('openlayers.bvb.tileloadend', function() {
         $scope.$apply(function() {
-            console.log('Tile loaded');
             usSpinnerService.stop('spinner-1');
         });
     });

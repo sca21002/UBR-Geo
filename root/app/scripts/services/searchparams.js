@@ -23,6 +23,7 @@ angular.module('ubrGeoApp')
         project: projectService.default(),
         library: libraryService.default(),
         yearExtent: [],
+        search: undefined
     };
     
     var factory = {};
@@ -66,15 +67,21 @@ angular.module('ubrGeoApp')
     factory.setLibrary = function(library) {
         data.library = library;
     };
-    
+
+    factory.getSearch = function() {
+        return data.search; 
+    };    
+
+    factory.setSearch = function(search) {
+        data.search = search;
+    };
+
     factory.getYearExtent = function() {
         return data.yearExtent; 
     };    
 
     factory.setYearExtent = function(yearExtent) {
-        console.log('searchparams: ', yearExtent);
         angular.copy(yearExtent, data.yearExtent);
-        console.log('searchparams: ', data.yearExtent);
     };
     
     return factory; 

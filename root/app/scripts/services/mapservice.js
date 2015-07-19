@@ -11,8 +11,8 @@ angular.module('ubrGeoApp')
   .factory('mapservice', function ($q, $http, searchParams) {
 
     var factory = {};
-    var urlBase = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
-//    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
+//    var urlBase = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
+    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
 
     factory.getList = function () {
 
@@ -20,6 +20,7 @@ angular.module('ubrGeoApp')
         var page   = searchParams.getPage();
         var project = searchParams.getProject();
         var library = searchParams.getLibrary();
+        var search  = searchParams.getSearch();
         var yearExtent = searchParams.getYearExtent();
 
         // Creating a deffered object
@@ -29,8 +30,8 @@ angular.module('ubrGeoApp')
         if (page) { url = url + '&page=' + page; }
         if (project) { url = url + '&project=' + project; }
         if (library) { url = url + '&isil=' + library; }
+        if (search)  { url = url + '&search=' + search; }
         if (yearExtent && yearExtent[0] && yearExtent[1]) {
-            console.log('YearExtent: ', yearExtent);
             url = url + '&year_min=' + yearExtent[0] + '&year_max=' + yearExtent[1];
         }
 

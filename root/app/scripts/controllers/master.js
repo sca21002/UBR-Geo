@@ -17,15 +17,22 @@ angular.module('ubrGeoApp')
 
     $scope.projectChanged = function() {
         searchParams.setProject($scope.project);
-        $scope.$broadcast('ChangedProject',$scope.project);
+        $scope.$broadcast('ChangedProject', $scope.project);
     };    
 
     $scope.libraries = libraryService.load(); 
-    $scope.library   = libraryService.getLibrary();
+    $scope.library   = searchParams.getLibrary();
 
     $scope.libraryChanged = function() {
         searchParams.setLibrary($scope.library);
-        $scope.$broadcast('ChangedLibrary',$scope.library);
+        $scope.$broadcast('ChangedLibrary', $scope.library);
+    };
+
+    $scope.search = searchParams.getSearch();
+    
+    $scope.searchChanged = function() {
+        searchParams.setSearch($scope.search);
+        $scope.$broadcast('ChangedSearch', $scope.search);
     };
 
     $scope.$on('ChangedProject', function (event, project) {
@@ -34,6 +41,10 @@ angular.module('ubrGeoApp')
 
     $scope.$on('ChangedLibrary', function (event, library) {
         $scope.library = library;
+    });
+
+    $scope.$on('ChangedSearch',  function (event, search)  {
+        $scope.search = search;
     });
 
   });

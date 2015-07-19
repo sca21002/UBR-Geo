@@ -30,14 +30,18 @@ angular.module('ubrGeoApp')
           searchParams.setLibrary(library);
           $scope.$emit('ChangedLibrary', library);
       }
+
+      if ($routeParams.search) {
+          var search = $routeParams.search;
+          searchParams.setSearch(search);
+          $scope.$emit('ChangedSearch', search);
+      }
   
       if ($routeParams.x && $routeParams.y) {
           var x = $routeParams.x;
           var y = $routeParams.y;
-          console.log('x: ', x, ' y: ', y);
           proj4.defs('EPSG:31468','+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +datum=potsdam +units=m +no_defs');
           var coord4326 = ol.proj.transform([x,y], 'EPSG:31468', 'EPSG:4326');        
-          console.log(coord4326);
           center = { lon: coord4326[0], lat: coord4326[1] };
           searchParams.setCenter(center);
       }
@@ -138,14 +142,12 @@ angular.module('ubrGeoApp')
 
 
     $scope.yearExtentChanged = function(yearExtent) {
-        console.log('yearRange changed');
 
         var yearMin = $scope.yearRange[0].year;
         var yearMax = $scope.yearRange[$scope.yearRange.length -1].year;
         if (yearExtent[0] === yearMin &&  yearExtent[1] === yearMax) {
             return;
         }
-        console.log('Set Extent: ', yearExtent);
         searchParams.setYearExtent(yearExtent);
         getMaps();
     };
@@ -166,6 +168,12 @@ angular.module('ubrGeoApp')
     });
 
     $scope.$on('ChangedLibrary', function () {
+        $scope.currentPage = 1;
+        searchParams.setPage($scope.currentPage);
+        getMaps();
+    });
+
+    $scope.$on('ChangedSearch', function () {
         $scope.currentPage = 1;
         searchParams.setPage($scope.currentPage);
         getMaps();
