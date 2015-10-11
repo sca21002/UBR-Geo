@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
 
+0.012     2015-10-11 19:12:33+02:00 Europe/Berlin
+
     - Add handles to the yearslider
 
 0.011     2015-07-19 15:32:17+02:00 Europe/Berlin
