@@ -26,6 +26,7 @@ angular.module('ubrGeoApp')
             new ol.layer.Tile({
               source: new ol.source.XYZ({
                   url: mapboxURL,
+                  wrapX: false,
                   crossOrigin: null,
                   attributions: [
                     new ol.Attribution({
@@ -67,8 +68,6 @@ angular.module('ubrGeoApp')
             setExtent3857[2] = setExtent3857[2] - widthDelta;
             setExtent3857[3] = setExtent3857[3] - heightDelta;
 
-            var size = map.getSize();
-//            view.fitExtent(setExtent3857, size);
             var actualExtent3857 = view.calculateExtent( map.getSize() );
             var actualExtent4326 = ol.proj.transformExtent(actualExtent3857, 'EPSG:3857', 'EPSG:4326');
             searchParams.setExtent(actualExtent4326);

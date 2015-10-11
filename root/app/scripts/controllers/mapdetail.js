@@ -12,7 +12,7 @@
 /*global ol*/
 
 angular.module('ubrGeoApp')
-  .controller('MapdetailCtrl', function ($scope, $q, $routeParams, libraryService, mapservice, tileService, usSpinnerService) {
+  .controller('MapdetailCtrl', function ($location, $scope, $q, $routeParams, libraryService, mapservice, tileService, usSpinnerService) {
 
     $scope.name = 'MapdetailCtrl';
 
@@ -59,7 +59,7 @@ angular.module('ubrGeoApp')
                         this.push(parseFloat(coord));    
                     }, pixel);
                     mapservice.contains(mapId, xCenter, yCenter).then(function(data){
-                        
+
                         // tile size is calculated from max zoom level and size of a single tile          
                         var $tileSizeTot = Math.pow(2, maxZoom) * tileSize;
                        
@@ -82,8 +82,14 @@ angular.module('ubrGeoApp')
                         $scope.bvb.source.maxZoom = maxZoom; // seems as if it doesn't work
                     }, function(error) {
                             alert('Ein Fehler ist aufgetreten: ' + error);
+                            $location.path('/maps');
                     });
-            });    
+                },
+                function(error) {
+                    alert('Ein Fehler ist aufgetreten: ' + error);
+                    $location.path('/maps');
+                } 
+            );    
         });
     });
 

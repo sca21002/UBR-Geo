@@ -48,6 +48,7 @@ angular.module('ubrGeoApp')
 
       var brush = d3.svg.brush()
           .x(x)
+          .extent([0,1])
           .on('brush', brushmove)
           .on('brushend', brushend);
 
@@ -96,24 +97,85 @@ angular.module('ubrGeoApp')
           .attr('transform', 'translate(' + margin.left + ',' + (height + margin.top) + ')')
           .call(xAxis);        
       
-      context.append('g')
+      var brushg = context.append('g')
         .attr('class', 'x brush')
-          .call(brush)
-        .selectAll('rect')
+          .call(brush);
+          
+       brushg.selectAll('rect')
           .attr('y', -6)
           .attr('height', height + 7);
-       
+      
+
+       brushg.selectAll('.resize.e')
+        .append('rect')
+          .attr('x', 0)
+          .attr('y', -10)
+          .attr('width', 14)
+          .attr('height', height + 16)
+          .attr('rx', 5)
+          .attr('ry', 5)
+          .attr('fill', 'rgb(70,130,180)');
+
+
+      var data_e = [
+        { cx:4, cy:height/2-10 },
+        { cx:10, cy:height/2-10 },
+        { cx:4, cy:height/2-2 },
+        { cx:10, cy:height/2-2 },
+        { cx:4, cy:height/2+6 },
+        { cx:10, cy:height/2+6 }
+      ]; 
+
+      brushg.selectAll('.resize.e')
+          .selectAll('circle').data(data_e)
+          .enter()
+          .append('circle')
+          .attr('r', 2)
+          .attr('cx', function(d) { return d.cx; })
+          .attr('cy', function(d) { return d.cy; })
+          .style('fill', 'white');
+
+       brushg.selectAll('.resize.w')
+        .append('rect')
+          .attr('x', -14)
+          .attr('y', -10)
+          .attr('width', 14)
+          .attr('height', height + 16)
+          .attr('rx', 5)
+          .attr('ry', 5)
+          .attr('fill', 'rgb(70,130,180)');
+      
+      var data_w = [
+        { cx:-10, cy:height/2-10 },
+        { cx:-4, cy:height/2-10 },
+        { cx:-10, cy:height/2-2 },
+        { cx:-4, cy:height/2-2 },
+        { cx:-10, cy:height/2+6 },
+        { cx:-4, cy:height/2+6 }
+      ]; 
+
+      brushg.selectAll('.resize.w')
+          .selectAll('circle').data(data_w)
+          .enter()
+          .append('circle')
+          .attr('r', 2)
+          .attr('cx', function(d) { return d.cx; })
+          .attr('cy', function(d) { return d.cy; })
+          .style('fill', 'white');
+
+
       scope.redrawExtent = function(newExtent) {
         if (newExtent[0] === year_min && newExtent[1] === year_max) {
             brush.clear();
         } else {
-            var yearExtent = newExtent.map(function(d) { return yearFormat.parse(d.toString()); });
+            var yearExtent = newExtent.map(function(d) { 
+                return yearFormat.parse(d.toString()); 
+            });
             brush.extent(yearExtent);
         }    
         svg.select('.brush').call(brush);  // redraw brush
       };
 
-       
     };
 
     return {

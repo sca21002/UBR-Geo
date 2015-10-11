@@ -225,7 +225,11 @@ sub geotransform2 : Chained('map') PathPart('geotransform2') Args(0) {
     }
 
     my $map = $c->stash->{map};
-    my $geotransform_row = $map->geotransform;    
+    my $geotransform_row = $map->geotransform;  
+    unless ($geotransform_row) {
+         $c->detach('not_found');
+    }
+    $c->log->debug("geotransform: " . Dumper($geotransform_row));
     my $geotransform = UBR::Geo::Geotransform::Simple->new(
         $geotransform_row->get_columns()
     );
