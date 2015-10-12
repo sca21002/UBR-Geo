@@ -2,6 +2,9 @@ This file documents the revision history for Perl web application UBR-Geo.
 
 {{$NEXT}}
 
+    - Testing environment is detected by port of server url.
+      Backend server is chosen accordingly
+
 0.012     2015-10-11 19:12:33+02:00 Europe/Berlin
 
     - Add handles to the yearslider

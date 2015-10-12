@@ -8,11 +8,14 @@
  * Factory in the ubrGeoApp.
  */
 angular.module('ubrGeoApp')
-  .factory('mapservice', function ($q, $http, searchParams) {
+  .factory('mapservice', function ($q, $http, $location, searchParams) {
 
     var factory = {};
-//    var urlBase = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
-    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
+
+    var port = $location.port();
+    var test_url = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
+    var prod_url = 'http://pc1011406020.uni-regensburg.de:8888';
+    var urlBase = (port === 80)  ? prod_url : test_url;
 
     factory.getList = function () {
 
