@@ -17,7 +17,7 @@ angular.module('ubrGeoApp')
       $scope.name = 'MapsCtrl';
 
       var isValidExtent = helpers.isValidExtent;
-      var center;
+      var myCenter;
 
       if ($routeParams.project) {
           var project = $routeParams.project;
@@ -42,19 +42,19 @@ angular.module('ubrGeoApp')
           var y = $routeParams.y;
           proj4.defs('EPSG:31468','+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +datum=potsdam +units=m +no_defs');
           var coord4326 = ol.proj.transform([x,y], 'EPSG:31468', 'EPSG:4326');        
-          center = { lon: coord4326[0], lat: coord4326[1] };
-          searchParams.setCenter(center);
+          myCenter = { lon: coord4326[0], lat: coord4326[1] };
+          searchParams.setCenter(myCenter);
       }
 
       if ($routeParams.name) {
           searchParams.setName($routeParams.name);
       }
 
-      center        = searchParams.getCenter();
+      myCenter        = searchParams.getCenter();
       
      
       angular.extend( $scope, {
-      center : center,
+      center : myCenter,
       place  : searchParams.getName(),
       mapbox: { 
         source: {
@@ -118,7 +118,8 @@ angular.module('ubrGeoApp')
      
     $scope.$watch('center.bounds', function() {
         if (isValidExtent($scope.center.bounds)) {
-            searchParams.setCenter(center);
+            searchParams.setCenter($scope.center);
+            searchParams.setName(null);
             $scope.currentPage = 1;
             searchParams.setPage($scope.currentPage);
             getMaps();
@@ -154,7 +155,7 @@ angular.module('ubrGeoApp')
     
     $scope.open = function(map) {
         var mapId = map.map_id;
-        var extent = center.bounds;
+        var extent = $scope.center.bounds;
         $location.path('/map/'+ mapId);
         $location.search({
             x1: extent[0], y1: extent[1], x2: extent[2], y2: extent[3]

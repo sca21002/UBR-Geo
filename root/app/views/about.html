@@ -1,1 +1,56 @@
-<p>This is the about view.</p>
+<h1>ubrGeo - Räumliche Suche nach historischen Karten</h1>
+
+
+<h2>Suche</h2>
+<p>
+ubrGeo ist ein Portal der Universitätsbibliothek Regensburg zur räumlichen Suche nach historischen Karten. 
+Die räumliche Suche kann den dargestellten Ausschnitt einer Karte 
+auf der Erdoberfläche auswerten und so Karten finden, die ein bestimmtes 
+Gebiet darstellen.
+</p>
+
+<h2>Georeferenzierung</h2>
+<p>
+Vorrausetzung für die räumliche ist die Georeferenzierung der Karten. 
+Georeferenzierung bedeutet die Verortung der Karte auf dem Globus. Im einfachsten
+Fall werden die Koordinaten der vier Eckpunkte einer Karte gespeichert. Häufig ist 
+das Kartenbild keine einfaches Rechteck, daher werden für ein besseres Suchergebnis 
+die Umrisslinie der Karte in Koordinatenform festgehalten. 
+</p>
+
+<h2>Geodatenbank</h2>
+<p>
+Zur Speicherung und Auswertung räumlicher Daten braucht es geeignet Werkzeuge. Für
+eine schnelle Suche sind die Kartendaten in einer Geodatenbank abgelegt.
+</p>
+
+<h2>Technik</h2>
+
+<h3>Datenhaltung</h3>
+<p>PostgreSQL mit PostGIS-Erweiterung</p>
+<h3>Backend</h3>
+<p>Catalyst ein Framewerk nach dem Model-View-Controller (MVC) Entwurfsmuster, geschrieben in Perl</p>
+<h3>Frontend</h3>
+<ul>
+<li>Openlayers, eine JavaScript-Bibliothek für die Anzeige von  Geodaten im Webbrowser     
+<li>AngularJS, ein JavaScript-Framework nach dem Model-View-ViewModel-Muster</li>
+<li>D3.js, eine JavaScript-Bibliothek zur Datenvisualisierung</li>
+</ul>
+<h3>Hintergrundkarte</h3>
+<p>
+Kartengrundlage ist OpenStreetMap, die freie Weltkarte. Die Kartenkacheln werden von Mapbox geliefert.
+</p>
+<h3>Historische Karten</h3>
+<p>
+Die Ansicht der historischen Karten liefert der Bayerische Multimediaserver auf 
+Basis des Systems DigiTool.
+</p>
+
+<h2>Programmentwicklung:<h2/>
+Dr. Albert Schröder<br/>
+Universitätsbibliothek Regensburg<br/>
+albert.schroeder@ur.de<br/>
+ 
+
+
+
