@@ -103,7 +103,7 @@ sub find_with_geojson {
         },
         {
             join      => [ 'boundary' ],
-            '+select' => \'ST_AsGeoJSON(ST_Transform(boundary.boundary_wld,\'4326\'))',
+            '+select' => \'ST_AsGeoJSON(boundary.boundary_wld)',
             '+as'     => 'boundary',
         },
     )->first;
