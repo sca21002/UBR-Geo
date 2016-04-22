@@ -82,14 +82,13 @@ angular.module('ubrGeoApp')
                     type: 'Point',
                     coordinates: [ 0, 0 ] 
                   }
-                } 
+                }
               ]
-            },  
-            projection: 'EPSG:3857'
+            }
           }
         }
       },
-      attrib: { 
+      attrib: {
           collapsible: false
       },
       ovmap: {
