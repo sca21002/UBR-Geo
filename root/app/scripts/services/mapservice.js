@@ -13,8 +13,10 @@ angular.module('ubrGeoApp')
     var factory = {};
 
     var port = $location.port();
-    var test_url = 'http://pc1011406020.uni-regensburg.de/ubr/geo-srv';
-    var prod_url = 'http://pc1011406020.uni-regensburg.de:8888';
+    var host = $location.host();
+    var protocol = $location.protocol();
+    var prod_url = 'http://rzbvm038.uni-regensburg.de/ubr/geo-srv';
+    var test_url = 'http://rzbvm038.uni-regensburg.de:8888';
     var urlBase = (port === 80)  ? prod_url : test_url;
 
     factory.getList = function () {
