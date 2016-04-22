@@ -24,7 +24,9 @@ angular.module('ubrGeoApp')
           y = d3.scale.linear().range([height, 0]);
       
       var xAxis = d3.svg.axis().scale(x).orient('bottom');
-     
+
+      var brush;
+
       function brushend() {
           var yearExtent = brush.empty() ? x.domain() : brush.extent();
           yearExtent = yearExtent.map(function(d){return parseFloat(yearFormat(d)); });
@@ -46,11 +48,12 @@ angular.module('ubrGeoApp')
           scope.$apply();
       }
 
-      var brush = d3.svg.brush()
+      brush = d3.svg.brush()
           .x(x)
           .extent([0,1])
           .on('brush', brushmove)
           .on('brushend', brushend);
+
 
       var year_min = d3.min(data.map(function(d) { return d.year; }));
       var year_max = d3.max(data.map(function(d) { return d.year; }));
