@@ -43,6 +43,7 @@ angular.module('ubrGeoApp')
         $scope.library = library;
     });
 
+    $scope.$on('ChangedSearch', function (event, search) {
         $scope.search = search;
     });
 
