@@ -1,0 +1,25 @@
+.thumbnail-map {
+  height: 75px;
+}
+
+.year-range-slider {
+  height: 140px;  
+}
+
+.data {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}

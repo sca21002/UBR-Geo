@@ -1,49 +1,43 @@
-<div class="row">
-  <div class="col-md-7">
-      <div> 
-          Kartenmitte: 
-          {{ center.lon | number : 1 }}&deg;öL 
-          {{ center.lat | number : 1 }}&deg;nB
-      <span ng-show="place">
-          Ort: {{place}}
-      </span>
-      </div>
-    <openlayers id="map-nav" ol-center="center" ol-defaults="defaults" custom-layers="true">
-      <ol-layer ol-layer-properties="mapbox"></ol-layer> 
-      <ol-layer ol-layer-properties="boundingbox"></ol-layer>
-      <ol-control name="attribution" ol-control-properties="attrib"></ol-control> 
-      <ol-control name="overviewmap" ol-control-properties="ovmap"></ol-control> 
-    </openlayers>
-    <year-range-slider id="year-range" class="slider" data="yearRange" extent="yearExtent" action="yearExtentChanged(newExtent)"></year-range-slider>
-  </div>
-  <div class="col-md-5">
-    <table class="table table-condensed table-hover">
-    <thead> 
-       <tr>
-          <td colspan="2">
-            <div class="text-right">Karten: {{totalMaps}} Seite: {{currentPage}}/{{numPages}}</div>
-          </td>    
-      </thead>
-    <tfoot>
-        <tr>
-          <td colspan="2" class="text-center">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-7">
+      <div id="map" ngeo-map="mapsCtrl.map"></div>
+      <div ubr-geo-year-range-slider="mapsCtrl.mapsPerYear"
+           ubr-geo-year-range-slider-options ="mapsCtrl.sliderOptions"
+           ubr-geo-year-range-slider-extent ="mapsCtrl.yearExtent"
+           class="year-range-slider">
+      </div>  
+    </div>
+    <div class="col-md-5">
+      <table class="table table-condensed table-hover">
+        <thead> 
+          <tr>
+            <td colspan="2">
+              <div class="text-right">Karten: {{mapsCtrl.totalMaps}} Seite: {{mapsCtrl.page}}/{{mapsCtrl.numPages}}</div>
+            </td>    
+          </tr>  
+        </thead>
+        <tfoot>
+          <tr>
+            <td colspan="2" class="text-center">
               <uib-pagination 
-                ng-model="currentPage" 
-                total-items="totalMaps"
+                ng-model="mapsCtrl.page" 
+                total-items="mapsCtrl.totalMaps"
                 max-size = 6
                 items-per-page = 5
-                num-pages="numPages"
-                ng-change="pageChanged()"
-              ></uib-pagination>
-          </td>    
-        </tr>    
-      </tfoot>    
-      <tbody ng-mouseleave="leave()">    
-      <tr ng-repeat="map in maps" ng-mouseenter="hover(map)" ng-click="open(map)">
-          <td><img class="thumbnail-map" ng-src="{{map.icon}}"/></td>
-          <td class="map-row">{{map.isbd}} </td>  
-      </tr>
-      </tbody>  
-    </table>  
-  </div>    
+                num-pages="mapsCtrl.numPages"
+                ng-change="mapsCtrl.pageChanged()" >
+              </uib-pagination>
+            </td>    
+          </tr>    
+        </tfoot>    
+        <tbody ng-mouseleave="leave()">    
+        <tr ng-repeat="map in mapsCtrl.maps" ng-mouseenter="mapsCtrl.hover(map)" ng-click="mapsCtrl.open(map)">
+            <td><img class="thumbnail-map" ng-src="{{map.icon}}"/></td>
+            <td class="map-row">{{map.isbd}} </td>  
+        </tr>
+        </tbody>  
+      </table>  
+    </div>    
+  </div>
 </div>  

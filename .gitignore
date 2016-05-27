@@ -1,5 +1,7 @@
 /ubr_geo_*.*
 /UBR-Geo-*
-.build
+/.build
+/root/.build
+/root/build
 *.log
 *.swp

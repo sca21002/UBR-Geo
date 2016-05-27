@@ -1,26 +1,9 @@
 <div id="mapdetail-title">
-  {{isbd}}
+  {{mapdetailCtrl.isbd}}
 </div>
 <div id = "exemplar">
-    {{exemplar}}
+    {{mapdetailCtrl.exemplar}}
 </div>    
-<span us-spinner spinner-key="spinner-1" spinner-start-active="true"></span>
-<openlayers id="map-nav" ol-defaults="defaults" custom-layers="true" ol-extent="myextent">
-  <ol-layer ol-layer-properties="bvb"></ol-layer> 
-  <ol-control name="attribution" ol-control-properties="attrib"></ol-control>  
-  <ol-control name="fullscreen"></ol-control> 
-</openlayers>
-
-<h1>Events defaults example</h1>
-<p>In this example we propagate two events in our map, the mouse position and the mouse click.</p>
-<p>Set desired projection:
-    <input type="button" ng-click="projection='EPSG:3857'" value="EPSG:3857" />
-    <input type="button" ng-click="projection='EPSG:4326'" value="EPSG:4326" />
-</p>
-<h3>Mouse position</h3>
-<pre ng-bind="mouseposition | json"></pre>
-<h3>Mouse click position</h3>
-<pre ng-bind="mouseclickposition | json"></pre>
-<h3>Zoom</h3>
-<pre ng-bind="mouseclickposition | json"></pre>
-
+<div>
+  <div id="map" ngeo-map="mapdetailCtrl.map"></div>
+</div>
